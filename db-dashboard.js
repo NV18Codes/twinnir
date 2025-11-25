@@ -8,15 +8,28 @@ function showDatabaseDashboard() {
     const dashboard = document.getElementById('db-dashboard');
     if (dashboard) {
         dashboard.style.display = 'block';
+        dashboard.classList.remove('hidden');
+        dashboard.classList.add('show');
+        currentDbTab = 'organizations';
+        // Switch to organizations tab
+        switchDbTab('organizations');
         loadDbData('organizations');
+    } else {
+        console.error('Dashboard modal not found');
+        alert('Dashboard modal not found. Please refresh the page.');
     }
 }
+
+// Make function globally accessible
+window.showDatabaseDashboard = showDatabaseDashboard;
 
 // Close database dashboard
 function closeDatabaseDashboard() {
     const dashboard = document.getElementById('db-dashboard');
     if (dashboard) {
         dashboard.style.display = 'none';
+        dashboard.classList.add('hidden');
+        dashboard.classList.remove('show');
     }
 }
 
@@ -215,11 +228,28 @@ async function renderMediaList() {
 // Show add form
 async function showAddForm(entityType) {
     currentEditId = null;
+    
+    // Map entity type to table name for currentDbTab
+    const tableMap = {
+        'organization': 'organizations',
+        'property': 'properties',
+        'space': 'spaces',
+        'asset': 'assets',
+        'space_type': 'space_types',
+        'asset_type': 'asset_types'
+    };
+    
+    currentDbTab = tableMap[entityType] || entityType;
+    
     const modal = document.getElementById('db-form-modal');
     const form = document.getElementById('db-form');
     const title = document.getElementById('db-form-title');
     
-    if (!modal || !form || !title) return;
+    if (!modal || !form || !title) {
+        console.error('Form modal elements not found');
+        alert('Form modal not found. Please refresh the page.');
+        return;
+    }
     
     const entityNames = {
         'organization': 'Organization',
@@ -430,7 +460,17 @@ async function handleDbFormSubmit(event) {
     }
     
     try {
-        const tableName = currentDbTab;
+        // Map entity type to table name
+        const tableNameMap = {
+            'organizations': 'organizations',
+            'properties': 'properties',
+            'spaces': 'spaces',
+            'assets': 'assets',
+            'space_types': 'space_types',
+            'asset_types': 'asset_types'
+        };
+        
+        const tableName = tableNameMap[currentDbTab] || currentDbTab;
         let result;
         
         if (currentEditId) {
@@ -445,7 +485,14 @@ async function handleDbFormSubmit(event) {
         
         alert(currentEditId ? 'Item updated successfully!' : 'Item created successfully!');
         closeDbFormModal();
-        loadDbData(tableName);
+        loadDbData(currentDbTab);
+        
+        // Refresh upload form dropdowns if they exist
+        if (typeof populateUploadFormDropdowns === 'function') {
+            setTimeout(() => {
+                populateUploadFormDropdowns();
+            }, 500);
+        }
     } catch (error) {
         console.error('Error saving:', error);
         alert('Error saving: ' + error.message);

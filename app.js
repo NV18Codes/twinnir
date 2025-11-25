@@ -104,9 +104,14 @@ function initializeMap() {
         return;
     }
 
-    // Initialize Leaflet map
-    map = L.map('map').setView([-26.106, 28.17], 13);
+    // Initialize Leaflet map - center on Gauteng, South Africa
+    map = L.map('map', {
+        zoomControl: true,
+        attributionControl: true
+    }).setView([-26.106, 28.17], 13);
     window.map = map; // Make globally accessible
+    
+    console.log('🗺️ Map initialized at:', map.getCenter());
 
     // Add satellite map tile layer (Google Maps style)
     const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -401,26 +406,38 @@ function extractGPSFromImage(file, callback) {
         return;
     }
     
-    EXIF.getData(file, function() {
-        const lat = EXIF.getTag(this, 'GPSLatitude');
-        const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
-        const lng = EXIF.getTag(this, 'GPSLongitude');
-        const lngRef = EXIF.getTag(this, 'GPSLongitudeRef');
-        
-        if (lat && lng) {
-            // Convert to decimal degrees
-            let latDecimal = lat[0] + lat[1]/60 + lat[2]/3600;
-            let lngDecimal = lng[0] + lng[1]/60 + lng[2]/3600;
+    if (typeof EXIF === 'undefined') {
+        console.warn('EXIF.js library not loaded');
+        callback(null);
+        return;
+    }
+    
+    try {
+        EXIF.getData(file, function() {
+            const lat = EXIF.getTag(this, 'GPSLatitude');
+            const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
+            const lng = EXIF.getTag(this, 'GPSLongitude');
+            const lngRef = EXIF.getTag(this, 'GPSLongitudeRef');
             
-            // Apply reference (N/S, E/W)
-            if (latRef === 'S') latDecimal = -latDecimal;
-            if (lngRef === 'W') lngDecimal = -lngDecimal;
-            
-            callback({ lat: latDecimal, lng: lngDecimal });
-        } else {
-            callback(null);
-        }
-    });
+            if (lat && Array.isArray(lat) && lng && Array.isArray(lng)) {
+                // Convert to decimal degrees (handle cases where minutes/seconds might be missing)
+                let latDecimal = lat[0] + (lat[1] || 0)/60 + (lat[2] || 0)/3600;
+                let lngDecimal = lng[0] + (lng[1] || 0)/60 + (lng[2] || 0)/3600;
+                
+                // Apply reference (N/S, E/W)
+                if (latRef === 'S') latDecimal = -latDecimal;
+                if (lngRef === 'W') lngDecimal = -lngDecimal;
+                
+                callback({ lat: latDecimal, lng: lngDecimal });
+            } else {
+                console.log('GPS coordinates not found in EXIF data');
+                callback(null);
+            }
+        });
+    } catch (error) {
+        console.error('Error extracting GPS from image:', error);
+        callback(null);
+    }
 }
 
 async function handleLocationUpload(event) {
@@ -433,12 +450,18 @@ async function handleLocationUpload(event) {
 
     const name = document.getElementById('location-name').value.trim();
     const description = document.getElementById('location-description').value.trim();
-    const category = document.getElementById('location-category').value;
+    const category = 'property'; // Default category
     let lat = parseCoordinate(document.getElementById('location-lat').value);
     let lng = parseCoordinate(document.getElementById('location-lng').value);
     const file = document.getElementById('location-file').files[0];
     const urlInput = document.getElementById('location-url');
     const url = urlInput ? urlInput.value.trim() : null;
+    
+    // Check file size (1GB = 1073741824 bytes)
+    if (file && file.size > 1073741824) {
+        alert('File size exceeds 1GB limit. Please use a direct link for files larger than 1GB.');
+        return;
+    }
 
     if (!name || !category) {
         alert('Please fill in Name and Category fields');
@@ -446,25 +469,51 @@ async function handleLocationUpload(event) {
     }
     
     // If coordinates not provided, try to extract from image
-    if ((!lat || !lng) && file && file.type.startsWith('image/')) {
+    if ((!lat || !lng) && file && file.type.startsWith('image/') && typeof EXIF !== 'undefined') {
         extractGPSFromImage(file, (coords) => {
             if (coords) {
-                lat = coords.lat;
-                lng = coords.lng;
-                document.getElementById('location-lat').value = lat.toFixed(6);
-                document.getElementById('location-lng').value = lng.toFixed(6);
-                // Show on map
-                if (window.map) {
-                    window.map.setView([lat, lng], 15);
-                    L.marker([lat, lng]).addTo(window.map).bindPopup('Extracted from image').openPopup();
+                // Validate South Africa bounds
+                const validation = validateSouthAfricaCoordinates(coords.lat, coords.lng);
+                if (validation.valid) {
+                    lat = coords.lat;
+                    lng = coords.lng;
+                    document.getElementById('location-lat').value = lat.toFixed(6);
+                    document.getElementById('location-lng').value = lng.toFixed(6);
+                    // Show on map
+                    const currentMap = map || window.map;
+                    if (currentMap && typeof currentMap.setView === 'function') {
+                        currentMap.setView([lat, lng], 15);
+                        const marker = L.marker([lat, lng])
+                            .addTo(currentMap)
+                            .bindPopup('GPS extracted from image')
+                            .openPopup();
+                    }
+                    // Continue with upload
+                    continueUpload();
+                } else {
+                    alert('GPS coordinates found but outside South Africa bounds. Please enter coordinates manually.');
                 }
-                // Continue with upload
-                continueUpload();
             } else {
                 alert('No GPS coordinates found in image. Please enter coordinates manually.');
             }
         });
         return;
+    }
+    
+    // If coordinates are provided manually, validate and show on map
+    if (lat && lng) {
+        const validation = validateSouthAfricaCoordinates(lat, lng);
+        if (validation.valid) {
+            // Show location on map
+            const currentMap = map || window.map;
+            if (currentMap && typeof currentMap.setView === 'function') {
+                currentMap.setView([lat, lng], 15);
+                const marker = L.marker([lat, lng])
+                    .addTo(currentMap)
+                    .bindPopup('Location to upload')
+                    .openPopup();
+            }
+        }
     }
 
     if (!lat || !lng) {
@@ -492,24 +541,7 @@ async function handleLocationUpload(event) {
             const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
             const filePath = `locations/${fileName}`;
 
-            // Check if bucket exists, create if not
-            const { data: buckets } = await supabase.storage.listBuckets();
-            const bucketExists = buckets && buckets.some(b => b.name === 'location-files');
-            
-            if (!bucketExists) {
-                // Try to create bucket (may fail if user doesn't have permission)
-                const { error: createError } = await supabase.storage.createBucket('location-files', {
-                    public: true,
-                    allowedMimeTypes: ['image/*', 'video/*'],
-                    fileSizeLimit: 52428800 // 50MB
-                });
-                if (createError && !createError.message.includes('already exists')) {
-                    console.warn('Could not create bucket:', createError.message);
-                    alert('Storage bucket not found. Please create a bucket named "location-files" in Supabase Storage with public access.');
-                    return;
-                }
-            }
-
+            // Try to upload directly - bucket should exist
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('location-files')
                 .upload(filePath, file, {
@@ -518,12 +550,14 @@ async function handleLocationUpload(event) {
                 });
 
             if (uploadError) {
-                if (uploadError.message.includes('Bucket not found')) {
-                    alert('Storage bucket "location-files" not found. Please create it in Supabase Storage settings.');
+                if (uploadError.message.includes('Bucket not found') || uploadError.message.includes('not found')) {
+                    alert('⚠️ Storage bucket "location-files" not accessible.\n\nPlease verify in Supabase:\n1. Go to Storage > Buckets\n2. Ensure "location-files" bucket exists\n3. Ensure it is marked as "Public"\n4. Check Storage Policies allow authenticated users to INSERT');
+                    return;
                 } else {
-                    throw uploadError;
+                    console.error('Upload error:', uploadError);
+                    alert('Upload failed: ' + uploadError.message);
+                    return;
                 }
-                return;
             }
 
             const { data: { publicUrl } } = supabase.storage
@@ -579,10 +613,11 @@ async function handleLocationUpload(event) {
             asset_id: assetId || null
         };
         
-        // Only add file_url if no media will be saved to location_media
-        if (fileUrl && !url) {
-            locationData.file_url = fileUrl;
-            locationData.media_type = mediaType;
+        // Always add file_url and media_type to location for popup display
+        const mediaUrl = fileUrl || url;
+        if (mediaUrl) {
+            locationData.file_url = mediaUrl;
+            locationData.media_type = mediaType || (url ? (url.toLowerCase().includes('video') ? 'video' : 'image') : null);
         }
         
         const { data: locationResult, error: locationError } = await supabase
@@ -593,20 +628,19 @@ async function handleLocationUpload(event) {
         if (locationError) {
             throw locationError;
         }
-        
+
         if (!locationResult || locationResult.length === 0) {
             throw new Error('Location was not saved');
         }
-        
+
         const savedLocation = locationResult[0];
         
         // Save media to location_media table if file or URL provided
-        if (fileUrl || url) {
-            const mediaUrl = fileUrl || url;
+        if (mediaUrl) {
             const mediaData = {
                 location_id: savedLocation.id,
                 file_url: mediaUrl,
-                media_type: mediaType || (url ? (url.toLowerCase().includes('video') ? 'video' : 'image') : null)
+                media_type: locationData.media_type
             };
             
             const { error: mediaError } = await supabase
@@ -626,7 +660,16 @@ async function handleLocationUpload(event) {
         if (fileName) fileName.textContent = '';
         closeUploadModal();
         
-        // Add blue marker to map and center view
+        // Remove preview marker if exists
+        if (window.previewMarker) {
+            const currentMap = map || window.map;
+            if (currentMap) {
+                currentMap.removeLayer(window.previewMarker);
+            }
+            window.previewMarker = null;
+        }
+        
+        // Add blue marker to map and center view with image preview
         if (lat && lng) {
             const currentMap = map || window.map;
             if (currentMap) {
@@ -640,22 +683,89 @@ async function handleLocationUpload(event) {
                 });
 
                 currentMap.setView([lat, lng], 15);
+                
+                // Build popup content with image preview
+                // Use saved location data which includes file_url and media_type
+                const savedMediaUrl = savedLocation.file_url || mediaUrl;
+                const savedMediaType = savedLocation.media_type || mediaType;
+                
+                let popupContent = `<div style="min-width: 250px; max-width: 400px;">
+                    <b style="font-size: 1.1rem; color: #333;">${name}</b><br>`;
+                
+                if (description) {
+                    popupContent += `<p style="margin: 0.5rem 0; color: #666;">${description}</p>`;
+                }
+                
+                if (savedMediaUrl) {
+                    if (savedMediaType === 'image') {
+                        popupContent += `<img src="${savedMediaUrl}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="window.open('${savedMediaUrl}', '_blank')" title="Click to view full size" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">`;
+                    } else if (savedMediaType === 'video') {
+                        popupContent += `<video src="${savedMediaUrl}" controls style="width: 100%; max-height: 300px; border-radius: 4px; margin-top: 0.5rem;"></video>`;
+                    } else {
+                        popupContent += `<a href="${savedMediaUrl}" target="_blank" style="color: #23d18b; text-decoration: underline; display: block; margin-top: 0.5rem;">View Media</a>`;
+                    }
+                }
+                
+                popupContent += `</div>`;
+                
                 const marker = L.marker([lat, lng], { icon: blueIcon })
                     .addTo(currentMap)
-                    .bindPopup(`<b>${name}</b><br><strong>Category:</strong> ${category}<br>${description || ''}`)
+                    .bindPopup(popupContent)
                     .openPopup();
                 
                 locationMarkers.push(marker);
             }
         }
 
-        // Reload all locations
-        loadMapLocations();
+        // Reload all locations and center on the new one
+        setTimeout(() => {
+            // Clear existing markers first to ensure fresh load
+            const currentMap = map || window.map;
+            if (currentMap) {
+                locationMarkers.forEach(marker => {
+                    if (currentMap.hasLayer(marker)) {
+                        currentMap.removeLayer(marker);
+                    }
+                });
+            }
+            locationMarkers = [];
+            console.log('🔄 Cleared existing markers, reloading all locations...');
+            
+            // Reload all locations from database
+            loadMapLocations();
+            
+            // Center map on the newly uploaded location
+            if (lat && lng) {
+                if (currentMap) {
+                    currentMap.setView([lat, lng], 15);
+                    console.log(`✅ Map centered on uploaded location: (${lat}, ${lng})`);
+                    
+                    // Find and highlight the new marker after a short delay
+                    setTimeout(() => {
+                        const newMarker = locationMarkers.find(m => {
+                            if (m.locationData) {
+                                // Try to match by coordinates
+                                const pos = m.getLatLng();
+                                return Math.abs(pos.lat - lat) < 0.0001 && Math.abs(pos.lng - lng) < 0.0001;
+                            }
+                            return false;
+                        });
+                        if (newMarker) {
+                            newMarker.openPopup();
+                            console.log(`✅ New marker found and popup opened: ${newMarker.locationData?.name || 'Unknown'}`);
+                        } else {
+                            console.warn(`⚠️ New marker not found at (${lat}, ${lng}) - check if location was saved`);
+                        }
+                    }, 1000);
+                }
+            }
+        }, 500);
 
     } catch (error) {
         console.error('Upload error:', error);
         alert('Error uploading location: ' + error.message);
     }
+    } // Close continueUpload function
 }
 
 // Load all locations from database and display on map
@@ -678,20 +788,33 @@ async function loadMapLocations() {
         locationMarkers = [];
 
         // Fetch all locations from database
-        const { data: locations, error } = await supabase
-            .from('locations')
-            .select('*')
-            .order('created_at', { ascending: false });
+        console.log('🔄 Loading locations from database...');
+        let locations, error;
+        try {
+            const result = await supabase
+                .from('locations')
+                .select('*')
+                .order('created_at', { ascending: false });
+            locations = result.data;
+            error = result.error;
+        } catch (fetchError) {
+            console.error('❌ Network error loading locations:', fetchError);
+            // Don't show alert for network errors - might be temporary
+            return;
+        }
 
         if (error) {
-            console.error('Error loading locations:', error);
+            console.error('❌ Error loading locations:', error);
+            // Don't show alert - just log it
             return;
         }
 
         if (!locations || locations.length === 0) {
-            // This is normal - no locations have been uploaded yet
+            console.log('ℹ️ No locations found in database');
             return;
         }
+
+        console.log(`📍 Found ${locations.length} location(s) in database:`, locations);
 
         // Create blue icon for markers
         const blueIcon = L.icon({
@@ -704,27 +827,161 @@ async function loadMapLocations() {
         });
 
         // Add markers for each location
+        let bounds = null;
         locations.forEach(location => {
-            const popupContent = `
-                <div style="min-width: 200px;">
-                    <b>${location.name}</b><br>
-                    <strong>Category:</strong> ${location.category}<br>
-                    ${location.description ? `<p style="margin: 0.5rem 0;">${location.description}</p>` : ''}
-                    ${location.file_url ? `<a href="${location.file_url}" target="_blank" style="color: #23d18b; text-decoration: underline;">View Media</a>` : ''}
-                </div>
-            `;
+            // Ensure coordinates are numbers
+            const lat = parseFloat(location.latitude);
+            const lng = parseFloat(location.longitude);
+            
+            // Validate coordinates
+            if (isNaN(lat) || isNaN(lng)) {
+                console.error('Invalid coordinates for location:', location.id, location.name, 'lat:', location.latitude, 'lng:', location.longitude);
+                return;
+            }
+            
+            // Build popup content with coordinates and image preview (like the example)
+            let popupContent = `<div style="min-width: 200px; max-width: 400px; font-family: Arial, sans-serif;">
+                <b style="font-size: 1.1rem; color: #333; display: block; margin-bottom: 0.5rem;">${location.name || 'Unnamed Location'}</b>`;
+            
+            // Add coordinates like in the example
+            popupContent += `<div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; line-height: 1.4;">
+                <div>Lat: ${lat.toFixed(6)}</div>
+                <div>Lng: ${lng.toFixed(6)}</div>
+            </div>`;
+            
+            if (location.description) {
+                popupContent += `<p style="margin: 0.5rem 0; color: #666; font-size: 0.9rem;">${location.description}</p>`;
+            }
+            
+            if (location.file_url) {
+                if (location.media_type === 'image') {
+                    popupContent += `<img src="${location.file_url}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="window.open('${location.file_url}', '_blank')" title="Click to view full size" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">`;
+                } else if (location.media_type === 'video') {
+                    popupContent += `<video src="${location.file_url}" controls style="width: 100%; max-height: 300px; border-radius: 4px; margin-top: 0.5rem;"></video>`;
+                } else {
+                    popupContent += `<a href="${location.file_url}" target="_blank" style="color: #23d18b; text-decoration: underline; display: block; margin-top: 0.5rem;">View Media</a>`;
+                }
+            }
+            
+            popupContent += `</div>`;
 
-            const marker = L.marker([location.latitude, location.longitude], { icon: blueIcon })
+            // Check if marker already exists for this specific location ID (avoid duplicate database entries)
+            // Allow multiple markers at same coordinates if they're different database entries
+            const existingMarker = locationMarkers.find(m => {
+                if (m.locationData && m.locationData.id === location.id) {
+                    return true; // Same location ID already has a marker
+                }
+                return false;
+            });
+            
+            if (existingMarker) {
+                console.log(`⚠️ Skipping duplicate marker for location ID: ${location.id} (${location.name})`);
+                return; // Skip if this exact location ID already has a marker
+            }
+            
+            // Create marker - store location data for reference
+            const marker = L.marker([lat, lng], { 
+                icon: blueIcon
+            })
                 .addTo(currentMap)
-                .bindPopup(popupContent);
+                .bindPopup(popupContent, {
+                    closeButton: true,
+                    autoClose: false,
+                    closeOnClick: false,
+                    className: 'custom-popup'
+                });
+            
+            // Store location data in marker for duplicate detection and reference
+            marker.locationData = location;
+            
+            // Open popup automatically for the first marker or most recent location
+            if (locationMarkers.length === 0 || location === locations[0]) {
+                marker.openPopup();
+            }
             
             locationMarkers.push(marker);
+            
+            // Make marker more visible - add a click event
+            marker.on('click', function() {
+                this.openPopup();
+                console.log(`📍 Clicked marker: ${location.name} at (${lat}, ${lng})`);
+            });
+            
+            console.log(`✅ Created marker for: ${location.name} (ID: ${location.id}) at (${lat}, ${lng})`);
+            
+            // Add to bounds for fitting map view
+            if (!bounds) {
+                bounds = L.latLngBounds([[lat, lng], [lat, lng]]);
+            } else {
+                bounds.extend([lat, lng]);
+            }
+            
+            console.log(`✅ Added marker for: ${location.name} at (${lat}, ${lng})`);
         });
 
-        console.log(`Loaded ${locations.length} locations`);
+        // Fit map to show all markers if we have any
+        if (bounds && locationMarkers.length > 0) {
+            // If only one location, center and zoom on it
+            if (locationMarkers.length === 1) {
+                const singleLocation = locations[0];
+                const singleLat = parseFloat(singleLocation.latitude);
+                const singleLng = parseFloat(singleLocation.longitude);
+                if (!isNaN(singleLat) && !isNaN(singleLng)) {
+                    currentMap.setView([singleLat, singleLng], 15);
+                    console.log(`✅ Map centered on single location: ${singleLocation.name} at (${singleLat}, ${singleLng})`);
+                }
+            } else {
+                // Multiple locations - fit bounds but ensure good zoom
+                currentMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+                console.log('✅ Map fitted to show all locations');
+            }
+            
+            // Always center on the most recent location (first in the list) and open its popup
+            if (locations.length > 0) {
+                const mostRecent = locations[0];
+                const recentLat = parseFloat(mostRecent.latitude);
+                const recentLng = parseFloat(mostRecent.longitude);
+                if (!isNaN(recentLat) && !isNaN(recentLng)) {
+                    // Center on most recent
+                    currentMap.setView([recentLat, recentLng], 15);
+                    console.log(`✅ Map centered on most recent location: ${mostRecent.name} at (${recentLat}, ${recentLng})`);
+                    
+                    // Find and open popup for most recent marker
+                    setTimeout(() => {
+                        const recentMarker = locationMarkers.find(m => {
+                            const pos = m.getLatLng();
+                            return Math.abs(pos.lat - recentLat) < 0.0001 && Math.abs(pos.lng - recentLng) < 0.0001;
+                        });
+                        if (recentMarker) {
+                            recentMarker.openPopup();
+                            console.log(`✅ Popup opened for: ${mostRecent.name}`);
+                        }
+                    }, 500);
+                }
+            }
+        }
+
+        console.log(`✅ Loaded ${locations.length} locations, ${locationMarkers.length} unique markers displayed`);
+        
+        // Log unique locations vs duplicates
+        if (locations.length > locationMarkers.length) {
+            console.warn(`⚠️ Found ${locations.length - locationMarkers.length} duplicate location(s) in database`);
+        }
+        
+        // Verify markers are actually on the map
+        if (locationMarkers.length > 0) {
+            locationMarkers.forEach((marker, idx) => {
+                const pos = marker.getLatLng();
+                const isOnMap = currentMap.hasLayer(marker);
+                console.log(`📍 Marker ${idx + 1} position: (${pos.lat}, ${pos.lng}) - On map: ${isOnMap}`);
+                if (!isOnMap) {
+                    console.error(`❌ Marker ${idx + 1} is NOT on the map!`);
+                }
+            });
+        }
 
     } catch (error) {
-        console.error('Error loading locations:', error);
+        console.error('❌ Error loading locations:', error);
     }
 }
 

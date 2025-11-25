@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Twinnir Virtual Tour</title>
+    <title>Twinnir</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" id="metaViewport" content="user-scalable=no, initial-scale=1, width=device-width, viewport-fit=cover" data-tdv-general-scale="0.5"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -87,9 +87,15 @@
     <div id="preloadContainer" class="fill-viewport"><div style="z-index: 4; position: absolute; overflow: hidden; background-size: contain; background-image: url('loading/HTMLImage_0FA5B9A9_10B2_8069_41AA_A42E5E8E30DC.jpg'); background-repeat: no-repeat; background-position: center center; overflow: hidden; right: 0%; bottom: 0%; width: 100.00%; height: 100.00%" ></div><div style="z-index: 5; position: absolute; overflow: hidden; left: 0%; top: 80.78%; width: 100.00%; height: 10.00%" ><div style="text-align:left; color:#000; "><DIV STYLE="text-align:center;font-size:1.666666666666666vmin;"><SPAN STYLE="display:inline-block; letter-spacing:0vmin; white-space:pre-wrap;color:#777777;font-family:Arial, Helvetica, sans-serif;"><SPAN STYLE="color:#ffffff;font-size:1.67vmin;"><B>Loading virtual tour. Please wait...</B></SPAN></SPAN></DIV></div></div></div>
     <div id="viewer" class="fill-viewport"></div>
     
+    <!-- Map View Container (hidden by default) -->
+    <div id="map-view-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; background: #fff;">
+        <div id="map" style="width: 100%; height: 100%;"></div>
+    </div>
+    
     <!-- Control Buttons -->
     <div class="tour-controls">
         <button class="tour-btn tour-btn-home" onclick="window.location.href='landing.html'">← Return to Home</button>
+        <button id="tour-map-btn" class="tour-btn" style="background: rgba(47, 152, 202, 0.9); color: white;" onclick="toggleMapView()">🗺️ View Map</button>
         <button id="tour-upload-btn" class="tour-btn tour-btn-upload" style="display: none;" onclick="showUploadModal()">📍 Upload Location</button>
         <button id="tour-logout-btn" class="tour-btn tour-btn-logout" style="display: none;" onclick="handleLogout()">Logout</button>
     </div>
@@ -111,47 +117,37 @@
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label for="location-category" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Category *</label>
-                    <select id="location-category" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; font-family: inherit; background: white;">
-                        <option value="">Select Category</option>
-                        <option value="asset">Asset</option>
-                        <option value="space">Space</option>
-                        <option value="asset_type">Asset Type</option>
-                        <option value="space_type">Space Type</option>
-                        <option value="property">Property</option>
-                    </select>
-                </div>
-                
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Media Upload</label>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Option 1: Upload File (Image/Video)</label>
-                        <input type="file" id="location-file" accept="image/*,video/*" style="width: 100%; padding: 0.5rem;">
-                        <small style="color: #666; font-size: 0.85rem;">Max file size: 50MB. Supported: Images and Videos</small>
-                    </div>
-                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Option 2: Or Provide Link (for larger files)</label>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Media Upload (Optional)</label>
+                    <input type="file" id="location-file" accept="image/*,video/*" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;" onchange="handleFileSelectForCoordinates(event)" data-max-size="1073741824">
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ddd;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #666; font-size: 0.9rem;">Or provide a direct link:</label>
                         <input type="url" id="location-url" placeholder="https://example.com/media/video.mp4" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                        <small style="color: #666; font-size: 0.85rem;">Enter a direct link to your media file (for large files)</small>
                     </div>
+                    <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.5rem;">
+                        📎 Upload: Images (JPG, PNG) or Videos (MP4, AVI) - Max 1GB (Note: Supabase free tier has 50MB limit, paid plans support larger files)<br>
+                        🔗 Link: Direct URL to media file (for larger files or files > 1GB)<br>
+                        📍 GPS coordinates will be automatically extracted from images if available
+                    </small>
                 </div>
                 
                 <div class="form-group" style="margin-bottom: 1rem;">
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Coordinates *</label>
                     <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
-                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;" onchange="showLocationOnMap()" oninput="showLocationOnMap()">
+                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;" onchange="showLocationOnMap()" oninput="showLocationOnMap()">
                     </div>
-                    <button type="button" onclick="getCurrentCoordinates()" style="width: 100%; padding: 0.6rem; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 0.5rem; font-weight: 600;">
-                        📍 Get Current Coordinates
-                    </button>
-                    <small style="color: #666; font-size: 0.85rem;">Enter decimal degrees (e.g., -26.106) or DMS format (e.g., 26;6;22.889).</small>
+                    <small style="color: #666; font-size: 0.85rem;">Enter decimal degrees (e.g., -26.106) or DMS format (e.g., 26;6;22.889). Location will be shown on map automatically.</small>
+                    <div id="location-map-preview" style="width: 100%; height: 300px; margin-top: 1rem; border: 2px solid #ddd; border-radius: 4px; display: none;"></div>
                 </div>
                 
                 <button type="submit" style="width: 100%; padding: 0.75rem; background: #23d18b; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;">Upload Location</button>
             </form>
         </div>
     </div>
+    
+    <!-- Load Leaflet for map preview -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     
     <!-- Load Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -198,11 +194,294 @@
                 }
                 checkAuthState();
                 alert('Logged out successfully');
+                // Redirect to landing page after logout
+                window.location.href = 'landing.html';
             } catch (error) {
                 console.error('Logout error:', error);
                 alert('Error logging out');
             }
         }
+        
+        // Toggle between virtual tour and map view
+        let mapViewActive = false;
+        let mainMap = null;
+        let mainMapMarkers = [];
+        
+        function toggleMapView() {
+            const viewer = document.getElementById('viewer');
+            const mapContainer = document.getElementById('map-view-container');
+            const mapBtn = document.getElementById('tour-map-btn');
+            
+            mapViewActive = !mapViewActive;
+            
+            if (mapViewActive) {
+                // Show map, hide tour
+                if (viewer) viewer.style.display = 'none';
+                if (mapContainer) mapContainer.style.display = 'block';
+                if (mapBtn) mapBtn.textContent = '🎥 View Tour';
+                
+                // Initialize map if not already done
+                if (!mainMap) {
+                    setTimeout(() => {
+                        initializeMainMap();
+                    }, 100);
+                } else {
+                    mainMap.invalidateSize();
+                    loadMainMapLocations();
+                }
+            } else {
+                // Show tour, hide map
+                if (viewer) viewer.style.display = 'block';
+                if (mapContainer) mapContainer.style.display = 'none';
+                if (mapBtn) mapBtn.textContent = '🗺️ View Map';
+            }
+        }
+        
+        // Initialize main map on index.htm
+        function initializeMainMap() {
+            const mapElement = document.getElementById('map');
+            if (!mapElement) {
+                console.error('Map element not found');
+                return;
+            }
+            
+            // Initialize Leaflet map - center on tour location area
+            mainMap = L.map('map', {
+                zoomControl: true,
+                attributionControl: true
+            }).setView([-26.813, 30.440], 15); // Center on tour pins area
+            
+            console.log('🗺️ Main map initialized on index.htm');
+            
+            // Add satellite map tile layer
+            const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri',
+                maxZoom: 19
+            });
+            
+            satelliteLayer.addTo(mainMap);
+            
+            // Load locations
+            loadMainMapLocations();
+        }
+        
+        // Tour pins (hardcoded from the virtual tour)
+        const tourPins = [
+            { name: 'Main Inverter', lat: -26.812035, lng: 30.440672 },
+            { name: 'Boiler', lat: -26.812765, lng: 30.440978 },
+            { name: 'Huawei Inverter', lat: -26.815297, lng: 30.440140 }
+        ];
+        
+        // Load locations from Supabase and display on main map
+        async function loadMainMapLocations() {
+            if (!mainMap) {
+                console.log('Main map not initialized yet');
+                return;
+            }
+            
+            try {
+                // Clear existing markers
+                mainMapMarkers.forEach(marker => {
+                    if (mainMap.hasLayer(marker)) {
+                        mainMap.removeLayer(marker);
+                    }
+                });
+                mainMapMarkers = [];
+                
+                // Add tour pins first (always visible)
+                const blueIcon = L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                });
+                
+                tourPins.forEach(tourPin => {
+                    const popupContent = `<div style="min-width: 200px; max-width: 400px; font-family: Arial, sans-serif;">
+                        <b style="font-size: 1.1rem; color: #333; display: block; margin-bottom: 0.5rem;">${tourPin.name}</b>
+                        <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; line-height: 1.4;">
+                            <div>Lat: ${tourPin.lat.toFixed(6)}</div>
+                            <div>Lng: ${tourPin.lng.toFixed(6)}</div>
+                        </div>
+                    </div>`;
+                    
+                    const marker = L.marker([tourPin.lat, tourPin.lng], { icon: blueIcon })
+                        .addTo(mainMap)
+                        .bindPopup(popupContent, {
+                            closeButton: true,
+                            autoClose: false,
+                            closeOnClick: false
+                        });
+                    
+                    marker.isTourPin = true;
+                    mainMapMarkers.push(marker);
+                    console.log(`✅ Added tour pin: ${tourPin.name} at (${tourPin.lat}, ${tourPin.lng})`);
+                });
+                
+                // Fetch all locations from database (public access - no auth required)
+                console.log('🔄 Loading locations from database for main map...');
+                let locations = [];
+                let error = null;
+                
+                try {
+                    const result = await supabase
+                        .from('locations')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    locations = result.data || [];
+                    error = result.error;
+                } catch (fetchError) {
+                    console.error('❌ Network error loading locations:', fetchError);
+                    // Continue with tour pins even if database fails
+                }
+                
+                if (error) {
+                    console.error('❌ Error loading locations:', error);
+                    // Continue with tour pins even if database fails
+                }
+                
+                if (!locations || locations.length === 0) {
+                    console.log('ℹ️ No Supabase locations found in database (tour pins are still visible)');
+                } else {
+                    console.log(`📍 Found ${locations.length} Supabase location(s) in database`);
+                }
+                
+                // blueIcon already created above for tour pins, reuse it
+                // Initialize bounds with tour pins
+                let bounds = null;
+                if (tourPins.length > 0) {
+                    bounds = L.latLngBounds(tourPins.map(p => [p.lat, p.lng]));
+                }
+                
+                // Add Supabase markers for each location
+                locations.forEach(location => {
+                    // Ensure coordinates are numbers
+                    const lat = parseFloat(location.latitude);
+                    const lng = parseFloat(location.longitude);
+                    
+                    // Validate coordinates
+                    if (isNaN(lat) || isNaN(lng)) {
+                        console.error('Invalid coordinates for location:', location.id, location.name);
+                        return;
+                    }
+                    
+                    // Check if marker already exists for this location ID
+                    const existingMarker = mainMapMarkers.find(m => {
+                        if (m.locationData && m.locationData.id === location.id) {
+                            return true;
+                        }
+                        return false;
+                    });
+                    
+                    if (existingMarker) {
+                        console.log(`⚠️ Skipping duplicate marker for location ID: ${location.id}`);
+                        return;
+                    }
+                    
+                    // Build popup content with coordinates (like the example)
+                    let popupContent = `<div style="min-width: 200px; max-width: 400px; font-family: Arial, sans-serif;">
+                        <b style="font-size: 1.1rem; color: #333; display: block; margin-bottom: 0.5rem;">${location.name || 'Unnamed Location'}</b>`;
+                    
+                    // Add coordinates like in the example
+                    popupContent += `<div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem; line-height: 1.4;">
+                        <div>Lat: ${lat.toFixed(6)}</div>
+                        <div>Lng: ${lng.toFixed(6)}</div>
+                    </div>`;
+                    
+                    if (location.description) {
+                        popupContent += `<p style="margin: 0.5rem 0; color: #666; font-size: 0.9rem;">${location.description}</p>`;
+                    }
+                    
+                    if (location.file_url) {
+                        if (location.media_type === 'image') {
+                            popupContent += `<img src="${location.file_url}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="window.open('${location.file_url}', '_blank')" title="Click to view full size">`;
+                        } else if (location.media_type === 'video') {
+                            popupContent += `<video src="${location.file_url}" controls style="width: 100%; max-height: 300px; border-radius: 4px; margin-top: 0.5rem;"></video>`;
+                        } else {
+                            popupContent += `<a href="${location.file_url}" target="_blank" style="color: #23d18b; text-decoration: underline; display: block; margin-top: 0.5rem;">View Media</a>`;
+                        }
+                    }
+                    
+                    popupContent += `</div>`;
+                    
+                    const marker = L.marker([lat, lng], { icon: blueIcon })
+                        .addTo(mainMap)
+                        .bindPopup(popupContent, {
+                            closeButton: true,
+                            autoClose: false,
+                            closeOnClick: false
+                        });
+                    
+                    marker.locationData = location;
+                    mainMapMarkers.push(marker);
+                    
+                    // Add to bounds
+                    if (!bounds) {
+                        bounds = L.latLngBounds([[lat, lng], [lat, lng]]);
+                    } else {
+                        bounds.extend([lat, lng]);
+                    }
+                    
+                    console.log(`✅ Added marker for: ${location.name} at (${lat}, ${lng})`);
+                });
+                
+                // Fit map to show all markers (tour pins + Supabase locations)
+                if (bounds && mainMapMarkers.length > 0) {
+                    if (mainMapMarkers.length === 1) {
+                        // Only one marker - center on it
+                        const marker = mainMapMarkers[0];
+                        const pos = marker.getLatLng();
+                        mainMap.setView([pos.lat, pos.lng], 15);
+                        marker.openPopup();
+                    } else {
+                        // Multiple markers - fit bounds
+                        mainMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+                        // Open popup for first tour pin or most recent Supabase location
+                        if (locations.length > 0) {
+                            const mostRecent = locations[0];
+                            const recentLat = parseFloat(mostRecent.latitude);
+                            const recentLng = parseFloat(mostRecent.longitude);
+                            const recentMarker = mainMapMarkers.find(m => {
+                                if (m.locationData && m.locationData.id === mostRecent.id) {
+                                    return true;
+                                }
+                                return false;
+                            });
+                            if (recentMarker) {
+                                setTimeout(() => {
+                                    recentMarker.openPopup();
+                                }, 500);
+                            }
+                        } else if (mainMapMarkers.length > 0) {
+                            // No Supabase locations, open first tour pin
+                            setTimeout(() => {
+                                mainMapMarkers[0].openPopup();
+                            }, 500);
+                        }
+                    }
+                } else if (mainMapMarkers.length > 0) {
+                    // Only tour pins, no Supabase locations
+                    const tourBounds = L.latLngBounds(tourPins.map(p => [p.lat, p.lng]));
+                    mainMap.fitBounds(tourBounds, { padding: [50, 50], maxZoom: 15 });
+                    setTimeout(() => {
+                        mainMapMarkers[0].openPopup();
+                    }, 500);
+                }
+                
+                const supabaseCount = locations ? locations.length : 0;
+                const tourCount = tourPins.length;
+                console.log(`✅ Loaded ${tourCount} tour pins + ${supabaseCount} Supabase locations = ${mainMapMarkers.length} total markers displayed`);
+                
+            } catch (error) {
+                console.error('❌ Error loading locations:', error);
+            }
+        }
+        
+        // Make functions globally accessible
+        window.toggleMapView = toggleMapView;
+        window.loadMainMapLocations = loadMainMapLocations;
         
         // Upload Modal Functions
         function showUploadModal() {
@@ -221,20 +500,67 @@
             }
         }
         
-        // Get Current Coordinates
-        function getCurrentCoordinates() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        document.getElementById('location-lat').value = position.coords.latitude.toFixed(6);
-                        document.getElementById('location-lng').value = position.coords.longitude.toFixed(6);
-                    },
-                    (error) => {
-                        alert('Error getting location: ' + error.message);
+        // Show location on map when coordinates are entered manually
+        let previewMap = null;
+        let previewMarker = null;
+        
+        function showLocationOnMap() {
+            const latInput = document.getElementById('location-lat');
+            const lngInput = document.getElementById('location-lng');
+            const mapPreview = document.getElementById('location-map-preview');
+            
+            if (!latInput || !lngInput) return;
+            
+            const lat = parseCoordinate(latInput.value);
+            const lng = parseCoordinate(lngInput.value);
+            
+            // Validate South Africa bounds
+            if (lat && lng && lat >= -35 && lat <= -22 && lng >= 16 && lng <= 33) {
+                // Show map preview
+                if (mapPreview) {
+                    mapPreview.style.display = 'block';
+                    
+                    // Initialize map if not already done
+                    if (!previewMap) {
+                        previewMap = L.map('location-map-preview').setView([lat, lng], 13);
+                        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                            attribution: '© Esri',
+                            maxZoom: 19
+                        }).addTo(previewMap);
+                    } else {
+                        previewMap.setView([lat, lng], 15);
                     }
-                );
-            } else {
-                alert('Geolocation is not supported by this browser');
+                    
+                    // Remove existing preview marker if any
+                    if (previewMarker) {
+                        previewMap.removeLayer(previewMarker);
+                    }
+                    
+                    // Add preview marker
+                    const blueIcon = L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
+                    
+                    previewMarker = L.marker([lat, lng], { icon: blueIcon })
+                        .addTo(previewMap)
+                        .bindPopup('Location to upload')
+                        .openPopup();
+                    
+                    // Invalidate size to ensure proper rendering
+                    setTimeout(() => {
+                        if (previewMap) {
+                            previewMap.invalidateSize();
+                        }
+                    }, 100);
+                }
+            } else if (mapPreview && (!lat || !lng)) {
+                // Hide map if coordinates are invalid
+                mapPreview.style.display = 'none';
             }
         }
         
@@ -249,13 +575,18 @@
                 return;
             }
             
-            const name = document.getElementById('location-name').value;
-            const description = document.getElementById('location-description').value;
-            const category = document.getElementById('location-category').value;
+            const name = document.getElementById('location-name').value.trim();
+            const description = document.getElementById('location-description').value.trim();
             let lat = parseCoordinate(document.getElementById('location-lat').value);
             let lng = parseCoordinate(document.getElementById('location-lng').value);
             const file = document.getElementById('location-file').files[0];
             const url = document.getElementById('location-url').value;
+            
+            // Check file size (1GB = 1073741824 bytes)
+            if (file && file.size > 1073741824) {
+                alert('File size exceeds 1GB limit. Please use a direct link for files larger than 1GB.');
+                return;
+            }
             
             // Validate South Africa coordinates
             function validateSouthAfricaCoordinates(lat, lng) {
@@ -268,8 +599,49 @@
                 return { valid: true };
             }
             
-            if (!name || !category) {
-                alert('Please fill in Name and Category fields');
+            // If coordinates are already extracted from file selection, use them
+            // Otherwise try to extract now
+            if ((!lat || !lng) && file && file.type.startsWith('image/') && typeof EXIF !== 'undefined') {
+                try {
+                    EXIF.getData(file, function() {
+                        const gpsLat = EXIF.getTag(this, 'GPSLatitude');
+                        const gpsLatRef = EXIF.getTag(this, 'GPSLatitudeRef');
+                        const gpsLng = EXIF.getTag(this, 'GPSLongitude');
+                        const gpsLngRef = EXIF.getTag(this, 'GPSLongitudeRef');
+                        
+                        if (gpsLat && Array.isArray(gpsLat) && gpsLng && Array.isArray(gpsLng)) {
+                            let latDecimal = gpsLat[0] + (gpsLat[1] || 0)/60 + (gpsLat[2] || 0)/3600;
+                            let lngDecimal = gpsLng[0] + (gpsLng[1] || 0)/60 + (gpsLng[2] || 0)/3600;
+                            
+                            if (gpsLatRef === 'S') latDecimal = -latDecimal;
+                            if (gpsLngRef === 'W') lngDecimal = -lngDecimal;
+                            
+                            if (latDecimal >= -35 && latDecimal <= -22 && lngDecimal >= 16 && lngDecimal <= 33) {
+                                lat = latDecimal;
+                                lng = lngDecimal;
+                                document.getElementById('location-lat').value = lat.toFixed(6);
+                                document.getElementById('location-lng').value = lng.toFixed(6);
+                                alert('GPS coordinates extracted from image! Coordinates: ' + lat.toFixed(6) + ', ' + lng.toFixed(6));
+                                continueUpload();
+                            } else {
+                                alert('GPS coordinates found but outside South Africa bounds. Please enter coordinates manually.');
+                                return;
+                            }
+                        } else {
+                            alert('No GPS coordinates found in image. Please enter coordinates manually.');
+                            return;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error extracting GPS:', error);
+                    alert('Error extracting GPS coordinates. Please enter coordinates manually.');
+                    return;
+                }
+                return;
+            }
+            
+            if (!name) {
+                alert('Please fill in Location Name field');
                 return;
             }
             
@@ -284,25 +656,21 @@
                 return;
             }
             
+            continueUpload();
+            
+            async function continueUpload() {
+            
             try {
                 let fileUrl = url || null;
                 let mediaType = null;
                 
                 // Upload file if provided
                 if (file) {
-                    // Check if bucket exists
-                    const { data: buckets } = await supabase.storage.listBuckets();
-                    const bucketExists = buckets && buckets.some(b => b.name === 'location-files');
-                    
-                    if (!bucketExists) {
-                        alert('Storage bucket "location-files" not found. Please create it in Supabase Storage settings with public access.');
-                        return;
-                    }
-                    
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
                     const filePath = `locations/${fileName}`;
                     
+                    // Try to upload directly - bucket should exist
                     const { data: uploadData, error: uploadError } = await supabase.storage
                         .from('location-files')
                         .upload(filePath, file, {
@@ -311,12 +679,14 @@
                         });
                     
                     if (uploadError) {
-                        if (uploadError.message.includes('Bucket not found')) {
-                            alert('Storage bucket "location-files" not found. Please create it in Supabase Storage settings.');
+                        if (uploadError.message.includes('Bucket not found') || uploadError.message.includes('not found')) {
+                            alert('⚠️ Storage bucket "location-files" not accessible.\n\nPlease verify in Supabase:\n1. Go to Storage > Buckets\n2. Ensure "location-files" bucket exists\n3. Ensure it is marked as "Public"\n4. Check Storage Policies allow authenticated users to INSERT');
+                            return;
                         } else {
-                            throw uploadError;
+                            console.error('Upload error:', uploadError);
+                            alert('Upload failed: ' + uploadError.message);
+                            return;
                         }
-                        return;
                     }
                     
                     const { data: { publicUrl } } = supabase.storage
@@ -347,7 +717,7 @@
                 const locationData = {
                     name: name.trim(),
                     description: description ? description.trim() : null,
-                    category: category,
+                    category: 'property', // Default category
                     latitude: parseFloat(lat),
                     longitude: parseFloat(lng),
                     user_id: user.id
@@ -373,12 +743,88 @@
                     throw new Error('Location was not saved. Please try again.');
                 }
                 
-                alert('Location uploaded successfully!');
-                closeUploadModal();
+                // Update preview map to show the uploaded location
+                if (lat && lng) {
+                    // Ensure map preview is visible
+                    const mapPreview = document.getElementById('location-map-preview');
+                    if (mapPreview) {
+                        mapPreview.style.display = 'block';
+                    }
+                    
+                    // Initialize map if not already done
+                    if (!previewMap) {
+                        previewMap = L.map('location-map-preview').setView([lat, lng], 15);
+                        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                            attribution: '© Esri',
+                            maxZoom: 19
+                        }).addTo(previewMap);
+                    } else {
+                        previewMap.setView([lat, lng], 15);
+                    }
+                    
+                    // Remove preview marker
+                    if (previewMarker) {
+                        previewMap.removeLayer(previewMarker);
+                        previewMarker = null;
+                    }
+                    
+                    // Add success marker with image preview
+                    const blueIcon = L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    });
+                    
+                    // Build popup content with image preview
+                    let popupContent = `<div style="min-width: 250px; max-width: 400px;">
+                        <b style="font-size: 1.1rem; color: #333;">${name}</b><br>
+                        <span style="color: #23d18b; font-size: 0.9rem;">✓ Uploaded successfully!</span>`;
+                    
+                    if (description) {
+                        popupContent += `<p style="margin: 0.5rem 0; color: #666;">${description}</p>`;
+                    }
+                    
+                    if (fileUrl) {
+                        if (mediaType === 'image') {
+                            popupContent += `<img src="${fileUrl}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="window.open('${fileUrl}', '_blank')" title="Click to view full size">`;
+                        } else if (mediaType === 'video') {
+                            popupContent += `<video src="${fileUrl}" controls style="width: 100%; max-height: 300px; border-radius: 4px; margin-top: 0.5rem;"></video>`;
+                        } else {
+                            popupContent += `<a href="${fileUrl}" target="_blank" style="color: #23d18b; text-decoration: underline; display: block; margin-top: 0.5rem;">View Media</a>`;
+                        }
+                    }
+                    
+                    popupContent += `</div>`;
+                    
+                    previewMarker = L.marker([lat, lng], { icon: blueIcon })
+                        .addTo(previewMap)
+                        .bindPopup(popupContent)
+                        .openPopup();
+                    
+                    setTimeout(() => {
+                        previewMap.invalidateSize();
+                    }, 100);
+                }
+                
+                alert('Location uploaded successfully! ✅\n\nThe blue pin is shown on the map preview below. Click "View Map" to see it on the main map.');
+                
+                // Reload main map locations if map is active
+                if (mapViewActive && typeof loadMainMapLocations === 'function') {
+                    setTimeout(() => {
+                        loadMainMapLocations();
+                    }, 500);
+                }
+                
+                // Don't close modal immediately - let user see the location
+                // closeUploadModal();
             } catch (error) {
                 console.error('Upload error:', error);
                 alert('Error uploading location: ' + (error.message || 'Unknown error'));
             }
+            } // Close continueUpload function
         }
         
         function parseCoordinate(value) {
@@ -430,6 +876,56 @@
                         }
                     }
                 });
+            }
+        }
+        
+        // Handle file selection for automatic coordinate extraction
+        function handleFileSelectForCoordinates(event) {
+            const file = event.target.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                return;
+            }
+            
+            // Extract GPS coordinates from image immediately when file is selected
+            if (typeof EXIF !== 'undefined') {
+                EXIF.getData(file, function() {
+                    const gpsLat = EXIF.getTag(this, 'GPSLatitude');
+                    const gpsLatRef = EXIF.getTag(this, 'GPSLatitudeRef');
+                    const gpsLng = EXIF.getTag(this, 'GPSLongitude');
+                    const gpsLngRef = EXIF.getTag(this, 'GPSLongitudeRef');
+                    
+                    if (gpsLat && Array.isArray(gpsLat) && gpsLng && Array.isArray(gpsLng)) {
+                        // Convert to decimal degrees
+                        let latDecimal = gpsLat[0] + (gpsLat[1] || 0)/60 + (gpsLat[2] || 0)/3600;
+                        let lngDecimal = gpsLng[0] + (gpsLng[1] || 0)/60 + (gpsLng[2] || 0)/3600;
+                        
+                        // Apply reference (N/S, E/W)
+                        if (gpsLatRef === 'S') latDecimal = -latDecimal;
+                        if (gpsLngRef === 'W') lngDecimal = -lngDecimal;
+                        
+                        // Validate South Africa bounds
+                        if (latDecimal >= -35 && latDecimal <= -22 && lngDecimal >= 16 && lngDecimal <= 33) {
+                            document.getElementById('location-lat').value = latDecimal.toFixed(6);
+                            document.getElementById('location-lng').value = lngDecimal.toFixed(6);
+                            
+                            // Show location on preview map
+                            setTimeout(() => {
+                                showLocationOnMap();
+                            }, 100);
+                            
+                            alert('✅ GPS coordinates extracted from image!\n\nLatitude: ' + latDecimal.toFixed(6) + '\nLongitude: ' + lngDecimal.toFixed(6) + '\n\nLocation shown on map. You can now fill in other details and upload.');
+                        } else {
+                            alert('⚠️ GPS coordinates found in image but are outside South Africa bounds.\n\nCoordinates: ' + latDecimal.toFixed(6) + ', ' + lngDecimal.toFixed(6) + '\n\nPlease verify or enter coordinates manually.');
+                            // Still set the values so user can see them
+                            document.getElementById('location-lat').value = latDecimal.toFixed(6);
+                            document.getElementById('location-lng').value = lngDecimal.toFixed(6);
+                        }
+                    } else {
+                        console.log('No GPS coordinates found in image EXIF data');
+                    }
+                });
+            } else {
+                console.warn('EXIF.js library not loaded');
             }
         }
         

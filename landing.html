@@ -54,16 +54,20 @@
             align-items: center;
             cursor: pointer;
             transition: opacity 0.2s;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .logo-container:hover {
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
         .logo-img {
-            height: 30px;
+            height: 32px;
             width: auto;
-            max-width: 150px;
+            max-width: 180px;
             object-fit: contain;
         }
 
@@ -639,9 +643,11 @@
                 <div class="logo-text">TWINNIR</div>
             </div>
             <div class="nav-buttons">
-                <button id="db-dashboard-btn-header" style="display: none; padding: 0.5rem 1.5rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-right: 0.5rem;" onclick="showDatabaseDashboard()" title="Database Dashboard">
-                    📊 Database
-                </button>
+                <!-- Dashboard button hidden -->
+                <!-- <button id="db-dashboard-btn-header" style="display: none; padding: 0.5rem 1.5rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-right: 0.5rem;" onclick="showDatabaseDashboard()" title="Dashboard">
+                    📊 Dashboard
+                </button> -->
+                <button id="nav-logout-btn" class="btn-logout" style="display: none; padding: 0.6rem 1.5rem; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-right: 0.5rem;" onclick="handleLogout()">Logout</button>
                 <button class="btn-signin" onclick="showLoginModal()">Sign In</button>
                 <button class="btn-signup" onclick="showSignUpModal()">Sign Up</button>
             </div>
@@ -692,10 +698,7 @@
         
         <!-- Top Left Controls -->
         <div id="top-left-controls" style="position: absolute; top: 15px; left: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 12px; max-width: 250px; pointer-events: auto;">
-            <!-- Logo -->
-            <div style="background: rgba(0, 0, 0, 0.8); padding: 8px 15px; border-radius: 6px; color: white; font-weight: 700; font-size: 1.2rem; letter-spacing: 2px;">
-                TWINNIR
-            </div>
+            <!-- Logo removed -->
             <!-- Space Dropdown -->
             <div style="background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
                 <label for="space-dropdown" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #333;">Space</label>
@@ -728,10 +731,10 @@
                     <option value="org3">Organization 3</option>
                 </select>
             </div>
-            <!-- Database Dashboard Button -->
-            <button id="db-dashboard-btn" style="display: none; padding: 10px 20px; background: rgba(35, 209, 139, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;" onclick="showDatabaseDashboard()" title="Database Dashboard">
-                📊 Database
-            </button>
+            <!-- Dashboard button hidden -->
+            <!-- <button id="db-dashboard-btn" style="display: none; padding: 10px 20px; background: rgba(35, 209, 139, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;" onclick="showDatabaseDashboard()" title="Dashboard">
+                📊 Dashboard
+            </button> -->
             <!-- Documents Button -->
             <button id="documents-btn" style="width: 45px; height: 45px; background: #23d18b; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex-shrink: 0;" title="Documents">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
@@ -816,18 +819,6 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="location-category">Category *</label>
-                    <select id="location-category" required>
-                        <option value="">Select Category</option>
-                        <option value="asset">Asset</option>
-                        <option value="space">Space</option>
-                        <option value="asset_type">Asset Type</option>
-                        <option value="space_type">Space Type</option>
-                        <option value="property">Property</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
                     <label for="location-organization">Organization (Optional)</label>
                     <select id="location-organization">
                         <option value="">Select Organization</option>
@@ -849,29 +840,26 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Media Upload</label>
-                    <div style="margin-bottom: 1rem;">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Option 1: Upload File (Image/Video)</label>
-                        <input type="file" id="location-file" accept="image/*,video/*" style="width: 100%; padding: 0.5rem;" onchange="handleFileSelect(event)">
-                        <small style="color: #666; font-size: 0.85rem;">Max file size: 50MB. Supported: Images and Videos. GPS coordinates will be extracted from images if available.</small>
-                    </div>
-                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Option 2: Or Provide Link (for larger files)</label>
+                    <label>Media Upload (Optional)</label>
+                    <input type="file" id="location-file" accept="image/*,video/*" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;" onchange="handleFileSelectForCoordinates(event)" data-max-size="1073741824">
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ddd;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #666; font-size: 0.9rem;">Or provide a direct link:</label>
                         <input type="url" id="location-url" placeholder="https://example.com/media/video.mp4">
-                        <small style="color: #666; font-size: 0.85rem;">Enter a direct link to your media file (for large files)</small>
                     </div>
+                    <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.5rem;">
+                        📎 Upload: Images (JPG, PNG) or Videos (MP4, AVI) - Max 50MB<br>
+                        🔗 Link: Direct URL to media file (for larger files)<br>
+                        📍 GPS coordinates will be automatically extracted from images if available
+                    </small>
                 </div>
                 
                 <div class="form-group">
                     <label>Coordinates *</label>
                     <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)" style="flex: 1;">
-                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)" style="flex: 1;">
+                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)" style="flex: 1;" onchange="showLocationOnMapLanding()" oninput="showLocationOnMapLanding()">
+                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)" style="flex: 1;" onchange="showLocationOnMapLanding()" oninput="showLocationOnMapLanding()">
                     </div>
-                    <button type="button" onclick="getCurrentCoordinates()" style="width: 100%; padding: 0.6rem; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 0.5rem;">
-                        📍 Get Current Coordinates
-                    </button>
-                    <small style="color: #666; font-size: 0.85rem;">Enter decimal degrees (e.g., -26.106) or DMS format (e.g., 26;6;22.889). Click on map to set coordinates.</small>
+                    <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Enter decimal degrees (e.g., -26.106) or DMS format (e.g., 26;6;22.889). Location will be shown on map automatically.</small>
                 </div>
                 
                 <button type="submit" class="btn-submit">Upload Location</button>
@@ -879,13 +867,13 @@
         </div>
     </div>
 
-    <!-- Database Dashboard Modal -->
-    <div id="db-dashboard" class="modal hidden" style="display: none; position: fixed; z-index: 20000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); overflow-y: auto;">
+    <!-- Database Dashboard Modal - Hidden/Disabled -->
+    <div id="db-dashboard" class="modal hidden" style="display: none !important; visibility: hidden; position: fixed; z-index: -1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); overflow-y: auto;">
         <div class="modal-content" style="max-width: 95%; max-height: 95vh; margin: 1rem auto; background: white; border-radius: 8px; padding: 0; position: relative;">
             <span class="close" onclick="closeDatabaseDashboard()" style="position: absolute; top: 15px; right: 20px; font-size: 32px; font-weight: bold; color: #666; cursor: pointer; z-index: 1001; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">&times;</span>
             
             <div style="padding: 2rem; border-bottom: 2px solid #eee;">
-                <h2 style="margin: 0; color: #333; font-size: 1.8rem;">Database Dashboard</h2>
+                <h2 style="margin: 0; color: #333; font-size: 1.8rem;">Dashboard</h2>
                 <p style="margin: 0.5rem 0 0 0; color: #666;">Manage Organizations, Spaces, Assets, and more</p>
             </div>
             
@@ -977,6 +965,9 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
+            <div class="footer-logo" style="margin-bottom: 1.5rem; display: flex; justify-content: center;">
+                <img src="logo.png" alt="Twinnir Logo" class="footer-logo-img">
+            </div>
             <div class="footer-contact">
                 <span class="footer-contact-item">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
@@ -1195,6 +1186,67 @@
                 }
             }
         }
+        
+        // Make function globally accessible
+        window.populateUploadFormDropdowns = populateUploadDropdowns;
+        
+        // Handle file selection for automatic coordinate extraction
+        function handleFileSelectForCoordinates(event) {
+            const file = event.target.files[0];
+            if (!file || !file.type.startsWith('image/')) {
+                return;
+            }
+            
+            // Extract GPS coordinates from image immediately when file is selected
+            if (typeof EXIF !== 'undefined') {
+                EXIF.getData(file, function() {
+                    const gpsLat = EXIF.getTag(this, 'GPSLatitude');
+                    const gpsLatRef = EXIF.getTag(this, 'GPSLatitudeRef');
+                    const gpsLng = EXIF.getTag(this, 'GPSLongitude');
+                    const gpsLngRef = EXIF.getTag(this, 'GPSLongitudeRef');
+                    
+                    if (gpsLat && Array.isArray(gpsLat) && gpsLng && Array.isArray(gpsLng)) {
+                        // Convert to decimal degrees
+                        let latDecimal = gpsLat[0] + (gpsLat[1] || 0)/60 + (gpsLat[2] || 0)/3600;
+                        let lngDecimal = gpsLng[0] + (gpsLng[1] || 0)/60 + (gpsLng[2] || 0)/3600;
+                        
+                        // Apply reference (N/S, E/W)
+                        if (gpsLatRef === 'S') latDecimal = -latDecimal;
+                        if (gpsLngRef === 'W') lngDecimal = -lngDecimal;
+                        
+                        // Validate South Africa bounds
+                        if (latDecimal >= -35 && latDecimal <= -22 && lngDecimal >= 16 && lngDecimal <= 33) {
+                            document.getElementById('location-lat').value = latDecimal.toFixed(6);
+                            document.getElementById('location-lng').value = lngDecimal.toFixed(6);
+                            
+                            // Show location on map if available
+                            const currentMap = map || window.map;
+                            if (currentMap && typeof currentMap.setView === 'function') {
+                                currentMap.setView([latDecimal, lngDecimal], 15);
+                                const marker = L.marker([latDecimal, lngDecimal])
+                                    .addTo(currentMap)
+                                    .bindPopup('GPS extracted from image')
+                                    .openPopup();
+                            }
+                            
+                            alert('✅ GPS coordinates extracted from image!\n\nLatitude: ' + latDecimal.toFixed(6) + '\nLongitude: ' + lngDecimal.toFixed(6) + '\n\nLocation shown on map. You can now fill in other details and upload.');
+                        } else {
+                            alert('⚠️ GPS coordinates found in image but are outside South Africa bounds.\n\nCoordinates: ' + latDecimal.toFixed(6) + ', ' + lngDecimal.toFixed(6) + '\n\nPlease verify or enter coordinates manually.');
+                            // Still set the values so user can see them
+                            document.getElementById('location-lat').value = latDecimal.toFixed(6);
+                            document.getElementById('location-lng').value = lngDecimal.toFixed(6);
+                        }
+                    } else {
+                        console.log('No GPS coordinates found in image EXIF data');
+                    }
+                });
+            } else {
+                console.warn('EXIF.js library not loaded');
+            }
+        }
+        
+        // Make function globally accessible
+        window.handleFileSelectForCoordinates = handleFileSelectForCoordinates;
 
         function closeUploadModal() {
             const modal = document.getElementById('uploadModal');
@@ -1205,22 +1257,63 @@
             }
         }
 
-        // Get Current Coordinates
-        function getCurrentCoordinates() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        document.getElementById('location-lat').value = position.coords.latitude.toFixed(6);
-                        document.getElementById('location-lng').value = position.coords.longitude.toFixed(6);
-                    },
-                    (error) => {
-                        alert('Error getting location: ' + error.message);
+        // Show location on map when coordinates are entered manually (landing.html)
+        function showLocationOnMapLanding() {
+            const latInput = document.getElementById('location-lat');
+            const lngInput = document.getElementById('location-lng');
+            
+            if (!latInput || !lngInput) return;
+            
+            function parseCoordinate(value) {
+                if (!value) return null;
+                if (value.includes(';')) {
+                    const parts = value.split(';').map(Number);
+                    if (parts.length === 3) {
+                        return parts[0] + parts[1] / 60 + parts[2] / 3600;
                     }
-                );
-            } else {
-                alert('Geolocation is not supported by this browser');
+                }
+                const num = parseFloat(value);
+                return isNaN(num) ? null : num;
+            }
+            
+            const lat = parseCoordinate(latInput.value);
+            const lng = parseCoordinate(lngInput.value);
+            
+            if (lat && lng) {
+                // Validate South Africa bounds
+                if (lat >= -35 && lat <= -22 && lng >= 16 && lng <= 33) {
+                    const currentMap = map || window.map;
+                    if (currentMap && typeof currentMap.setView === 'function') {
+                        currentMap.setView([lat, lng], 15);
+                        
+                        // Remove existing preview marker if any
+                        if (window.previewMarker) {
+                            currentMap.removeLayer(window.previewMarker);
+                        }
+                        
+                        // Add preview marker
+                        const previewMarker = L.marker([lat, lng], {
+                            icon: L.icon({
+                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41]
+                            })
+                        })
+                        .addTo(currentMap)
+                        .bindPopup('Location to upload')
+                        .openPopup();
+                        
+                        window.previewMarker = previewMarker;
+                    }
+                }
             }
         }
+        
+        // Make function globally accessible
+        window.showLocationOnMapLanding = showLocationOnMapLanding;
 
         // Handle Location Upload
         async function handleLocationUpload(event) {
@@ -1234,14 +1327,19 @@
 
             const name = document.getElementById('location-name').value;
             const description = document.getElementById('location-description').value;
-            const category = document.getElementById('location-category').value;
             const lat = parseCoordinate(document.getElementById('location-lat').value);
             const lng = parseCoordinate(document.getElementById('location-lng').value);
             const file = document.getElementById('location-file').files[0];
             const url = document.getElementById('location-url').value;
+            
+            // Check file size (1GB = 1073741824 bytes)
+            if (file && file.size > 1073741824) {
+                alert('File size exceeds 1GB limit. Please use a direct link for files larger than 1GB.');
+                return;
+            }
 
-            if (!name || !category || !lat || !lng) {
-                alert('Please fill in all required fields (Name, Category, and Coordinates are required)');
+            if (!name || !lat || !lng) {
+                alert('Please fill in all required fields (Name and Coordinates are required)');
                 return;
             }
 
@@ -1257,12 +1355,20 @@
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
                     const filePath = `locations/${fileName}`;
 
+                    // Try to upload directly - bucket should exist
                     const { data: uploadData, error: uploadError } = await supabase.storage
                         .from('location-files')
                         .upload(filePath, file);
 
                     if (uploadError) {
-                        throw uploadError;
+                        if (uploadError.message.includes('Bucket not found') || uploadError.message.includes('not found')) {
+                            alert('⚠️ Storage bucket "location-files" not accessible.\n\nPlease verify in Supabase:\n1. Go to Storage > Buckets\n2. Ensure "location-files" bucket exists\n3. Ensure it is marked as "Public"\n4. Check Storage Policies allow authenticated users to INSERT');
+                            return;
+                        } else {
+                            console.error('Upload error:', uploadError);
+                            alert('Upload failed: ' + uploadError.message);
+                            return;
+                        }
                     }
 
                     const { data: { publicUrl } } = supabase.storage
@@ -1302,7 +1408,7 @@
                 const locationData = {
                     name: name.trim(),
                     description: description ? description.trim() : null,
-                    category: category,
+                    category: 'property', // Default category
                     latitude: parseFloat(lat),
                     longitude: parseFloat(lng),
                     user_id: user.id
@@ -1334,6 +1440,58 @@
 
                 alert('Location uploaded successfully!');
                 closeUploadModal();
+                
+                // Remove preview marker if exists
+                if (window.previewMarker) {
+                    const currentMap = map || window.map;
+                    if (currentMap) {
+                        currentMap.removeLayer(window.previewMarker);
+                    }
+                    window.previewMarker = null;
+                }
+                
+                // Show location on map with blue pin and image preview
+                if (lat && lng) {
+                    const currentMap = map || window.map;
+                    if (currentMap && typeof currentMap.setView === 'function') {
+                        currentMap.setView([lat, lng], 15);
+                        
+                        // Create blue icon
+                        const blueIcon = L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        });
+                        
+                        // Build popup content with image preview
+                        let popupContent = `<div style="min-width: 250px; max-width: 400px;">
+                            <b style="font-size: 1.1rem; color: #333;">${name}</b><br>`;
+                        
+                        if (description) {
+                            popupContent += `<p style="margin: 0.5rem 0; color: #666;">${description}</p>`;
+                        }
+                        
+                        if (fileUrl) {
+                            if (mediaType === 'image') {
+                                popupContent += `<img src="${fileUrl}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="window.open('${fileUrl}', '_blank')" title="Click to view full size">`;
+                            } else if (mediaType === 'video') {
+                                popupContent += `<video src="${fileUrl}" controls style="width: 100%; max-height: 300px; border-radius: 4px; margin-top: 0.5rem;"></video>`;
+                            } else {
+                                popupContent += `<a href="${fileUrl}" target="_blank" style="color: #23d18b; text-decoration: underline; display: block; margin-top: 0.5rem;">View Media</a>`;
+                            }
+                        }
+                        
+                        popupContent += `</div>`;
+                        
+                        const marker = L.marker([lat, lng], { icon: blueIcon })
+                            .addTo(currentMap)
+                            .bindPopup(popupContent)
+                            .openPopup();
+                    }
+                }
                 
                 // Reload map locations
                 if (typeof loadMapLocations === 'function') {
@@ -1372,8 +1530,10 @@
             window.isAuthenticated = !!session;
             const uploadBtn = document.getElementById('upload-control-btn');
             const logoutBtn = document.getElementById('logout-btn');
-            const dbDashboardBtn = document.getElementById('db-dashboard-btn');
-            const dbDashboardBtnHeader = document.getElementById('db-dashboard-btn-header');
+            const navLogoutBtn = document.getElementById('nav-logout-btn');
+            // Dashboard buttons disabled/hidden
+            // const dbDashboardBtn = document.getElementById('db-dashboard-btn');
+            // const dbDashboardBtnHeader = document.getElementById('db-dashboard-btn-header');
             const signInBtn = document.querySelector('.btn-signin');
             const signUpBtn = document.querySelector('.btn-signup');
             
@@ -1383,12 +1543,17 @@
             if (logoutBtn) {
                 logoutBtn.style.display = window.isAuthenticated ? 'block' : 'none';
             }
-            if (dbDashboardBtn) {
-                dbDashboardBtn.style.display = window.isAuthenticated ? 'block' : 'none';
+            // Update header logout button
+            if (navLogoutBtn) {
+                navLogoutBtn.style.display = window.isAuthenticated ? 'inline-block' : 'none';
             }
-            if (dbDashboardBtnHeader) {
-                dbDashboardBtnHeader.style.display = window.isAuthenticated ? 'block' : 'none';
-            }
+            // Dashboard buttons disabled/hidden
+            // if (dbDashboardBtn) {
+            //     dbDashboardBtn.style.display = window.isAuthenticated ? 'block' : 'none';
+            // }
+            // if (dbDashboardBtnHeader) {
+            //     dbDashboardBtnHeader.style.display = window.isAuthenticated ? 'block' : 'none';
+            // }
             // Hide/show sign in/sign up buttons based on auth state
             if (signInBtn && signUpBtn) {
                 if (window.isAuthenticated) {
@@ -1409,19 +1574,43 @@
         // Logout function
         async function handleLogout() {
             try {
+                console.log('🔄 Logging out...');
                 const { error } = await supabase.auth.signOut();
                 if (error) {
+                    console.error('❌ Logout error:', error);
                     alert('Error logging out: ' + error.message);
                     return;
                 }
+                
+                // Clear authentication state
                 window.isAuthenticated = false;
+                
+                // Update UI immediately
                 updateUIForAuth(null);
+                
+                // Also update via authManager if available
+                if (window.authManager && typeof window.authManager.updateUIForLoggedOutUser === 'function') {
+                    window.authManager.updateUIForLoggedOutUser();
+                }
+                
+                console.log('✅ Logged out successfully');
+                
+                // Show success message
                 alert('Logged out successfully');
+                
+                // Optionally redirect to landing page if on a different page
+                if (window.location.pathname.includes('index.htm')) {
+                    window.location.href = 'landing.html';
+                }
+                
             } catch (error) {
-                console.error('Logout error:', error);
-                alert('Error logging out');
+                console.error('❌ Logout error:', error);
+                alert('Error logging out: ' + (error.message || 'Unknown error'));
             }
         }
+        
+        // Make handleLogout globally accessible
+        window.handleLogout = handleLogout;
 
         // Check on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -1628,7 +1817,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // This will be set up when map is initialized
             setTimeout(() => {
-                if (window.map) {
+                if (window.map && typeof window.map.on === 'function') {
                     window.map.on('click', (e) => {
                         const latInput = document.getElementById('location-lat');
                         const lngInput = document.getElementById('location-lng');
