@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Twinnir Virtual Tour</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" id="metaViewport" content="user-scalable=no, initial-scale=1, width=device-width, viewport-fit=cover" data-tdv-general-scale="0.5"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <script src="lib/tdvplayer.js?v=1761317857926"></script>
+    <link rel="preload" href="locale/en.txt?v=1761317857926" as="fetch" crossorigin="anonymous"/>
+	<link rel="preload" href="script.js?v=1761317857926" as="script"/>
+	<link rel="preload" href="media/panorama_07C3D6D5_0AC1_33D3_41A1_6C4FC80B1178_0/r/3/0_0.webp?v=1761317857926" as="image"/>
+	<link rel="preload" href="media/panorama_07C3D6D5_0AC1_33D3_41A1_6C4FC80B1178_0/l/3/0_0.webp?v=1761317857926" as="image"/>
+	<link rel="preload" href="media/panorama_07C3D6D5_0AC1_33D3_41A1_6C4FC80B1178_0/u/3/0_0.webp?v=1761317857926" as="image"/>
+	<link rel="preload" href="media/panorama_07C3D6D5_0AC1_33D3_41A1_6C4FC80B1178_0/d/3/0_0.webp?v=1761317857926" as="image"/>
+	<link rel="preload" href="media/panorama_07C3D6D5_0AC1_33D3_41A1_6C4FC80B1178_0/f/3/0_0.webp?v=1761317857926" as="image"/>
+	<link rel="preload" href="media/panorama_07C3D6D5_0AC1_33D3_41A1_6C4FC80B1178_0/b/3/0_0.webp?v=1761317857926" as="image"/>
+	<meta name="description" content="Virtual Tour"/>
+	<meta name="theme-color" content="#2F98CA"/>
+    <script src="script.js?v=1761317857926"></script>
+    <style type="text/css">
+        html, body { height:100%; width:100%; height:100vh; width:100vw; margin:0; padding:0; overflow:hidden; }
+        .fill-viewport { position:fixed; top:0; left:0; right:0; bottom:0; padding:0; margin:0; overflow: hidden; }
+        .fill-viewport.landscape-left { left: env(safe-area-inset-left); }
+		.fill-viewport.landscape-right { right: env(safe-area-inset-right); }
+        #viewer { z-index:1; }
+        #preloadContainer { z-index:2; opacity:0; background-color:rgba(47,152,202,1); transition: opacity 0.5s; -webkit-transition: opacity 0.5s; -moz-transition: opacity 0.5s; -o-transition: opacity 0.5s;}
+        
+        /* Control Buttons */
+        .tour-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+        
+        .tour-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .tour-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+        
+        .tour-btn-upload {
+            background: #23d18b;
+            color: white;
+        }
+        
+        .tour-btn-upload:hover {
+            background: #1fb870;
+        }
+        
+        .tour-btn-logout {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+        }
+        
+        .tour-btn-logout:hover {
+            background: rgba(200, 33, 49, 1);
+        }
+        
+        .tour-btn-home {
+            background: rgba(0,0,0,0.8);
+            color: white;
+        }
+        
+        .tour-btn-home:hover {
+            background: rgba(0,0,0,1);
+        }
+    </style>
+    <link rel="stylesheet" href="fonts.css?v=1761317857926">
+</head>
+<body>
+    <div id="preloadContainer" class="fill-viewport"><div style="z-index: 4; position: absolute; overflow: hidden; background-size: contain; background-image: url('loading/HTMLImage_0FA5B9A9_10B2_8069_41AA_A42E5E8E30DC.jpg'); background-repeat: no-repeat; background-position: center center; overflow: hidden; right: 0%; bottom: 0%; width: 100.00%; height: 100.00%" ></div><div style="z-index: 5; position: absolute; overflow: hidden; left: 0%; top: 80.78%; width: 100.00%; height: 10.00%" ><div style="text-align:left; color:#000; "><DIV STYLE="text-align:center;font-size:1.666666666666666vmin;"><SPAN STYLE="display:inline-block; letter-spacing:0vmin; white-space:pre-wrap;color:#777777;font-family:Arial, Helvetica, sans-serif;"><SPAN STYLE="color:#ffffff;font-size:1.67vmin;"><B>Loading virtual tour. Please wait...</B></SPAN></SPAN></DIV></div></div></div>
+    <div id="viewer" class="fill-viewport"></div>
+    
+    <!-- Control Buttons -->
+    <div class="tour-controls">
+        <button class="tour-btn tour-btn-home" onclick="window.location.href='landing.html'">← Return to Home</button>
+        <button id="tour-upload-btn" class="tour-btn tour-btn-upload" style="display: none;" onclick="showUploadModal()">📍 Upload Location</button>
+        <button id="tour-logout-btn" class="tour-btn tour-btn-logout" style="display: none;" onclick="handleLogout()">Logout</button>
+    </div>
+    
+    <!-- Upload Location Modal -->
+    <div id="uploadModal" class="modal hidden" style="display: none; position: fixed; z-index: 20000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); overflow-y: auto;">
+        <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; position: relative;">
+            <span class="close" onclick="closeUploadModal()" style="position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; color: #666; cursor: pointer; z-index: 1001;">&times;</span>
+            <h2 style="margin-top: 0;">Upload Location</h2>
+            <form id="uploadLocationForm" onsubmit="handleLocationUpload(event)">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="location-name" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Location Name *</label>
+                    <input type="text" id="location-name" required placeholder="Enter location name" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="location-description" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Description</label>
+                    <textarea id="location-description" rows="3" placeholder="Enter description" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; font-family: inherit;"></textarea>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="location-category" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Category *</label>
+                    <select id="location-category" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; font-family: inherit; background: white;">
+                        <option value="">Select Category</option>
+                        <option value="asset">Asset</option>
+                        <option value="space">Space</option>
+                        <option value="asset_type">Asset Type</option>
+                        <option value="space_type">Space Type</option>
+                        <option value="property">Property</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Media Upload</label>
+                    <div style="margin-bottom: 1rem;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Option 1: Upload File (Image/Video)</label>
+                        <input type="file" id="location-file" accept="image/*,video/*" style="width: 100%; padding: 0.5rem;">
+                        <small style="color: #666; font-size: 0.85rem;">Max file size: 50MB. Supported: Images and Videos</small>
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Option 2: Or Provide Link (for larger files)</label>
+                        <input type="url" id="location-url" placeholder="https://example.com/media/video.mp4" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                        <small style="color: #666; font-size: 0.85rem;">Enter a direct link to your media file (for large files)</small>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">Coordinates *</label>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem;">
+                    </div>
+                    <button type="button" onclick="getCurrentCoordinates()" style="width: 100%; padding: 0.6rem; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 0.5rem; font-weight: 600;">
+                        📍 Get Current Coordinates
+                    </button>
+                    <small style="color: #666; font-size: 0.85rem;">Enter decimal degrees (e.g., -26.106) or DMS format (e.g., 26;6;22.889).</small>
+                </div>
+                
+                <button type="submit" style="width: 100%; padding: 0.75rem; background: #23d18b; color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;">Upload Location</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Load Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.js"></script>
+    <script src="config.js"></script>
+    <script>
+        // Check authentication and show/hide buttons
+        function checkAuthState() {
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                const isAuthenticated = !!session;
+                const uploadBtn = document.getElementById('tour-upload-btn');
+                const logoutBtn = document.getElementById('tour-logout-btn');
+                
+                if (uploadBtn) {
+                    uploadBtn.style.display = isAuthenticated ? 'block' : 'none';
+                }
+                if (logoutBtn) {
+                    logoutBtn.style.display = isAuthenticated ? 'block' : 'none';
+                }
+            });
+        }
+        
+        // Listen for auth changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            const isAuthenticated = !!session;
+            const uploadBtn = document.getElementById('tour-upload-btn');
+            const logoutBtn = document.getElementById('tour-logout-btn');
+            
+            if (uploadBtn) {
+                uploadBtn.style.display = isAuthenticated ? 'block' : 'none';
+            }
+            if (logoutBtn) {
+                logoutBtn.style.display = isAuthenticated ? 'block' : 'none';
+            }
+        });
+        
+        // Logout function
+        async function handleLogout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) {
+                    alert('Error logging out: ' + error.message);
+                    return;
+                }
+                checkAuthState();
+                alert('Logged out successfully');
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Error logging out');
+            }
+        }
+        
+        // Upload Modal Functions
+        function showUploadModal() {
+            const modal = document.getElementById('uploadModal');
+            if (modal) {
+                modal.style.display = 'block';
+            }
+        }
+        
+        function closeUploadModal() {
+            const modal = document.getElementById('uploadModal');
+            if (modal) {
+                modal.style.display = 'none';
+                const form = document.getElementById('uploadLocationForm');
+                if (form) form.reset();
+            }
+        }
+        
+        // Get Current Coordinates
+        function getCurrentCoordinates() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('location-lat').value = position.coords.latitude.toFixed(6);
+                        document.getElementById('location-lng').value = position.coords.longitude.toFixed(6);
+                    },
+                    (error) => {
+                        alert('Error getting location: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser');
+            }
+        }
+        
+        // Handle Location Upload
+        async function handleLocationUpload(event) {
+            event.preventDefault();
+            
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                alert('Please sign in to upload locations');
+                window.location.href = 'landing.html';
+                return;
+            }
+            
+            const name = document.getElementById('location-name').value;
+            const description = document.getElementById('location-description').value;
+            const category = document.getElementById('location-category').value;
+            let lat = parseCoordinate(document.getElementById('location-lat').value);
+            let lng = parseCoordinate(document.getElementById('location-lng').value);
+            const file = document.getElementById('location-file').files[0];
+            const url = document.getElementById('location-url').value;
+            
+            // Validate South Africa coordinates
+            function validateSouthAfricaCoordinates(lat, lng) {
+                if (lat < -35 || lat > -22) {
+                    return { valid: false, message: 'Latitude must be between -35 and -22 (South Africa bounds)' };
+                }
+                if (lng < 16 || lng > 33) {
+                    return { valid: false, message: 'Longitude must be between 16 and 33 (South Africa bounds)' };
+                }
+                return { valid: true };
+            }
+            
+            if (!name || !category) {
+                alert('Please fill in Name and Category fields');
+                return;
+            }
+            
+            if (!lat || !lng) {
+                alert('Please provide coordinates. Coordinates must be within South Africa bounds (Lat: -35 to -22, Lng: 16 to 33)');
+                return;
+            }
+            
+            const validation = validateSouthAfricaCoordinates(lat, lng);
+            if (!validation.valid) {
+                alert(validation.message);
+                return;
+            }
+            
+            try {
+                let fileUrl = url || null;
+                let mediaType = null;
+                
+                // Upload file if provided
+                if (file) {
+                    // Check if bucket exists
+                    const { data: buckets } = await supabase.storage.listBuckets();
+                    const bucketExists = buckets && buckets.some(b => b.name === 'location-files');
+                    
+                    if (!bucketExists) {
+                        alert('Storage bucket "location-files" not found. Please create it in Supabase Storage settings with public access.');
+                        return;
+                    }
+                    
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    const filePath = `locations/${fileName}`;
+                    
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('location-files')
+                        .upload(filePath, file, {
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+                    
+                    if (uploadError) {
+                        if (uploadError.message.includes('Bucket not found')) {
+                            alert('Storage bucket "location-files" not found. Please create it in Supabase Storage settings.');
+                        } else {
+                            throw uploadError;
+                        }
+                        return;
+                    }
+                    
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('location-files')
+                        .getPublicUrl(filePath);
+                    
+                    fileUrl = publicUrl;
+                    
+                    const fileType = file.type.toLowerCase();
+                    if (fileType.startsWith('image/')) {
+                        mediaType = 'image';
+                    } else if (fileType.startsWith('video/')) {
+                        mediaType = 'video';
+                    }
+                } else if (url) {
+                    const urlLower = url.toLowerCase();
+                    if (urlLower.includes('image') || urlLower.match(/\.(jpg|jpeg|png|gif|webp)/i)) {
+                        mediaType = 'image';
+                    } else if (urlLower.includes('video') || urlLower.match(/\.(mp4|avi|mov|webm)/i)) {
+                        mediaType = 'video';
+                    } else if (urlLower.includes('360') || urlLower.includes('panorama')) {
+                        mediaType = '360';
+                    } else if (urlLower.includes('3dgs') || urlLower.includes('3d')) {
+                        mediaType = '3dgs';
+                    }
+                }
+                
+                const locationData = {
+                    name: name.trim(),
+                    description: description ? description.trim() : null,
+                    category: category,
+                    latitude: parseFloat(lat),
+                    longitude: parseFloat(lng),
+                    user_id: user.id
+                };
+                
+                if (fileUrl && fileUrl.trim()) {
+                    locationData.file_url = fileUrl.trim();
+                }
+                if (mediaType) {
+                    locationData.media_type = mediaType;
+                }
+                
+                const { data, error } = await supabase
+                    .from('locations')
+                    .insert([locationData])
+                    .select();
+                
+                if (error) {
+                    throw new Error(error.message || 'Failed to save location to database');
+                }
+                
+                if (!data || data.length === 0) {
+                    throw new Error('Location was not saved. Please try again.');
+                }
+                
+                alert('Location uploaded successfully!');
+                closeUploadModal();
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Error uploading location: ' + (error.message || 'Unknown error'));
+            }
+        }
+        
+        function parseCoordinate(value) {
+            if (!value) return null;
+            if (value.includes(';')) {
+                const parts = value.split(';').map(Number);
+                if (parts.length === 3) {
+                    return parts[0] + parts[1] / 60 + parts[2] / 3600;
+                }
+            }
+            const num = parseFloat(value);
+            return isNaN(num) ? null : num;
+        }
+        
+        // Handle file select for EXIF extraction (index.htm)
+        function handleFileSelectIndex(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Only process images
+            if (!file.type.startsWith('image/')) {
+                return;
+            }
+            
+            // Extract GPS coordinates from image
+            if (typeof EXIF !== 'undefined') {
+                EXIF.getData(file, function() {
+                    const lat = EXIF.getTag(this, 'GPSLatitude');
+                    const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
+                    const lng = EXIF.getTag(this, 'GPSLongitude');
+                    const lngRef = EXIF.getTag(this, 'GPSLongitudeRef');
+                    
+                    if (lat && lng) {
+                        // Convert to decimal degrees
+                        let latDecimal = lat[0] + lat[1]/60 + lat[2]/3600;
+                        let lngDecimal = lng[0] + lng[1]/60 + lng[2]/3600;
+                        
+                        // Apply reference (N/S, E/W)
+                        if (latRef === 'S') latDecimal = -latDecimal;
+                        if (lngRef === 'W') lngDecimal = -lngDecimal;
+                        
+                        // Validate South Africa bounds
+                        if (latDecimal >= -35 && latDecimal <= -22 && lngDecimal >= 16 && lngDecimal <= 33) {
+                            document.getElementById('location-lat').value = latDecimal.toFixed(6);
+                            document.getElementById('location-lng').value = lngDecimal.toFixed(6);
+                            alert('GPS coordinates extracted from image and set!');
+                        } else {
+                            alert('GPS coordinates found in image but are outside South Africa bounds. Please verify coordinates.');
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Check auth on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthState();
+        });
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('uploadModal');
+            if (event.target === modal) {
+                closeUploadModal();
+            }
+        }
+    </script>
+</body>
+</html>

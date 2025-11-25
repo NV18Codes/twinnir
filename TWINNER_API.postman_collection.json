@@ -1,0 +1,749 @@
+{
+	"info": {
+		"_postman_id": "twinnir-api-collection",
+		"name": "TWINNER API Collection",
+		"description": "API collection for TWINNER Digital Twins Platform - Location Management and Authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{supabase_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "supabase_url",
+			"value": "https://mdquwmiavgydtfcwpzzt.supabase.co",
+			"type": "string"
+		},
+		{
+			"key": "supabase_anon_key",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1kcXV3bWlhdmd5ZHRmY3dwenp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDcxNTcsImV4cCI6MjA3OTU4MzE1N30.rHOK9X5oCkZhW3nYtuba9oFa6FYgjU8Lfsath9zOBpo",
+			"type": "string"
+		},
+		{
+			"key": "supabase_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Sign Up",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.access_token) {",
+									"        pm.collectionVariables.set('supabase_token', jsonData.access_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"data\": {\n        \"name\": \"John Doe\",\n        \"organization\": \"Example Corp\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{supabase_url}}/auth/v1/signup",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"signup"
+							]
+						},
+						"description": "Register a new user account"
+					},
+					"response": []
+				},
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.access_token) {",
+									"        pm.collectionVariables.set('supabase_token', jsonData.access_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{supabase_url}}/auth/v1/token?grant_type=password",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"token"
+							],
+							"query": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"description": ""
+								}
+							]
+						},
+						"description": "Sign in with email and password"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/auth/v1/user",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"user"
+							]
+						},
+						"description": "Get the current authenticated user"
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Out",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/auth/v1/logout",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"logout"
+							]
+						},
+						"description": "Sign out the current user"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Locations",
+			"item": [
+				{
+					"name": "Get All Locations",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/locations?select=*&order=created_at.desc",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"locations"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*",
+									"description": ""
+								},
+								{
+									"key": "order",
+									"value": "created_at.desc",
+									"description": ""
+								}
+							]
+						},
+						"description": "Get all locations (public access, no auth required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Locations by Category",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/locations?select=*&category=eq.asset&order=created_at.desc",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"locations"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*",
+									"description": ""
+								},
+								{
+									"key": "category",
+									"value": "eq.asset",
+									"description": "Options: asset, space, asset_type, space_type, property"
+								},
+								{
+									"key": "order",
+									"value": "created_at.desc",
+									"description": ""
+								}
+							]
+						},
+						"description": "Filter locations by category (asset, space, asset_type, space_type, property)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Location by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/locations?select=*&id=eq.{{location_id}}",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"locations"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*",
+									"description": ""
+								},
+								{
+									"key": "id",
+									"value": "eq.{{location_id}}",
+									"description": ""
+								}
+							]
+						},
+						"description": "Get a specific location by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Prefer",
+								"value": "return=representation",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Main Building\",\n    \"description\": \"Primary office building\",\n    \"category\": \"property\",\n    \"latitude\": -26.106,\n    \"longitude\": 28.17,\n    \"file_url\": \"https://example.com/image.jpg\",\n    \"media_type\": \"image\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/locations",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"locations"
+							]
+						},
+						"description": "Create a new location (requires authentication). Categories: asset, space, asset_type, space_type, property"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Location",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Prefer",
+								"value": "return=representation",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Building Name\",\n    \"description\": \"Updated description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/locations?id=eq.{{location_id}}",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"locations"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.{{location_id}}",
+									"description": ""
+								}
+							]
+						},
+						"description": "Update a location (only owner can update)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Location",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/locations?id=eq.{{location_id}}",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"locations"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.{{location_id}}",
+									"description": ""
+								}
+							]
+						},
+						"description": "Delete a location (only owner can delete)"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Locations by Coordinates",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/locations?select=*&latitude=gte.-26.2&latitude=lte.-26.0&longitude=gte.28.0&longitude=lte.28.3",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"locations"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*",
+									"description": ""
+								},
+								{
+									"key": "latitude",
+									"value": "gte.-26.2",
+									"description": "Greater than or equal"
+								},
+								{
+									"key": "latitude",
+									"value": "lte.-26.0",
+									"description": "Less than or equal"
+								},
+								{
+									"key": "longitude",
+									"value": "gte.28.0",
+									"description": ""
+								},
+								{
+									"key": "longitude",
+									"value": "lte.28.3",
+									"description": ""
+								}
+							]
+						},
+						"description": "Search locations within a coordinate range"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profiles",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/profiles?select=*&id=eq.{{user_id}}",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"profiles"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*",
+									"description": ""
+								},
+								{
+									"key": "id",
+									"value": "eq.{{user_id}}",
+									"description": ""
+								}
+							]
+						},
+						"description": "Get user profile by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"organization\": \"Updated Organization\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{supabase_url}}/rest/v1/profiles?id=eq.{{user_id}}",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"profiles"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.{{user_id}}",
+									"description": ""
+								}
+							]
+						},
+						"description": "Update user profile"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Storage",
+			"item": [
+				{
+					"name": "Upload File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{supabase_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{supabase_url}}/storage/v1/object/location-files/{{file_path}}",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"storage",
+								"v1",
+								"object",
+								"location-files",
+								"{{file_path}}"
+							]
+						},
+						"description": "Upload a file to the location-files bucket"
+					},
+					"response": []
+				},
+				{
+					"name": "Get File URL",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apikey",
+								"value": "{{supabase_anon_key}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{supabase_url}}/storage/v1/object/public/location-files/{{file_path}}",
+							"host": [
+								"{{supabase_url}}"
+							],
+							"path": [
+								"storage",
+								"v1",
+								"object",
+								"public",
+								"location-files",
+								"{{file_path}}"
+							]
+						},
+						"description": "Get public URL for a file"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
+
