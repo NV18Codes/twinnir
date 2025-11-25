@@ -639,6 +639,9 @@
                 <div class="logo-text">TWINNIR</div>
             </div>
             <div class="nav-buttons">
+                <button id="db-dashboard-btn-header" style="display: none; padding: 0.5rem 1.5rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-right: 0.5rem;" onclick="showDatabaseDashboard()" title="Database Dashboard">
+                    📊 Database
+                </button>
                 <button class="btn-signin" onclick="showLoginModal()">Sign In</button>
                 <button class="btn-signup" onclick="showSignUpModal()">Sign Up</button>
             </div>
@@ -1370,6 +1373,7 @@
             const uploadBtn = document.getElementById('upload-control-btn');
             const logoutBtn = document.getElementById('logout-btn');
             const dbDashboardBtn = document.getElementById('db-dashboard-btn');
+            const dbDashboardBtnHeader = document.getElementById('db-dashboard-btn-header');
             const signInBtn = document.querySelector('.btn-signin');
             const signUpBtn = document.querySelector('.btn-signup');
             
@@ -1381,6 +1385,9 @@
             }
             if (dbDashboardBtn) {
                 dbDashboardBtn.style.display = window.isAuthenticated ? 'block' : 'none';
+            }
+            if (dbDashboardBtnHeader) {
+                dbDashboardBtnHeader.style.display = window.isAuthenticated ? 'block' : 'none';
             }
             // Hide/show sign in/sign up buttons based on auth state
             if (signInBtn && signUpBtn) {
@@ -1419,6 +1426,10 @@
         // Check on page load
         document.addEventListener('DOMContentLoaded', () => {
             checkAuthAndUpdateUI();
+            // Also check after a short delay to ensure all elements are loaded
+            setTimeout(() => {
+                checkAuthAndUpdateUI();
+            }, 500);
         });
 
         // Demo Modal Functions - Make globally accessible
