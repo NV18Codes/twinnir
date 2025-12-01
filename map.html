@@ -1,0 +1,1567 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twinnir - Map View</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <!-- Pannellum for 3D/360 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+    
+    <link rel="stylesheet" href="landing.css">
+    
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        #map {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+        
+        /* Top Left Controls - Dropdowns */
+        .top-left-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-dropdown {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            min-width: 160px;
+        }
+        
+        .filter-dropdown:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #23d18b;
+        }
+        
+        .filter-dropdown:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Top Right Controls */
+        .top-right-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .control-btn-small {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn-small:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn-home {
+            background: rgba(0,0,0,0.8);
+            color: white;
+        }
+        
+        .btn-tour {
+            background: rgba(47, 152, 202, 0.9);
+            color: white;
+        }
+        
+        .btn-upload {
+            background: #23d18b;
+            color: white;
+        }
+        
+        .btn-logout {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+        }
+        
+        /* Bottom Left - Zoom Controls */
+        .bottom-left-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .zoom-btn:hover {
+            background: rgba(47, 152, 202, 0.9);
+        }
+        
+        /* Bottom Right - Action Buttons */
+        .bottom-right-controls {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.85);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: rgba(47, 152, 202, 0.9);
+        }
+        
+        .action-btn.active {
+            background: #23d18b;
+        }
+        
+        /* Annotations Panel */
+        #annotations-panel {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            width: 260px;
+            background: rgba(0,0,0,0.9);
+            border-radius: 8px;
+            padding: 20px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        #annotations-panel.visible {
+            display: block;
+        }
+        
+        #annotations-panel h3 {
+            color: #23d18b;
+            margin: 0 0 15px 0;
+            font-size: 1rem;
+        }
+        
+        .drawing-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .draw-tool {
+            padding: 8px 12px;
+            background: rgba(47, 152, 202, 0.2);
+            border: 1px solid rgba(47, 152, 202, 0.5);
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        .draw-tool:hover {
+            background: rgba(47, 152, 202, 0.4);
+        }
+        
+        .color-palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .color-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Upload Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .modal-content .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            color: #333;
+            background: white;
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #999;
+        }
+        
+        .form-group small {
+            color: #666;
+            font-size: 0.85rem;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .coords-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .coords-row input {
+            flex: 1;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #23d18b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .submit-btn:hover {
+            background: #1fb870;
+        }
+        
+        .media-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .media-type-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .media-type-btn:hover {
+            border-color: #23d18b;
+        }
+        
+        .media-type-btn.active {
+            border-color: #23d18b;
+            background: rgba(35, 209, 139, 0.1);
+            color: #23d18b;
+        }
+        
+        #image-fields, #video-fields {
+            display: none;
+        }
+        
+        #image-fields.active, #video-fields.active {
+            display: block;
+        }
+        
+        /* Video Fullscreen Modal */
+        #videoModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 3000;
+        }
+        
+        #videoModal video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .video-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 3001;
+            background: rgba(0,0,0,0.7);
+            padding: 15px 25px;
+            border-radius: 12px;
+        }
+        
+        .video-controls button {
+            padding: 12px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .video-controls button:hover {
+            transform: scale(1.05);
+        }
+        
+        .video-controls .btn-3d {
+            background: #23d18b;
+            color: white;
+        }
+        
+        .video-controls .btn-close {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+        
+        /* 3D Viewer Modal */
+        #viewer3dModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 4000;
+        }
+        
+        #panorama-viewer {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .viewer-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 4001;
+        }
+        
+        .viewer-controls button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+        
+        .nav-hint {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            z-index: 4001;
+        }
+    </style>
+</head>
+<body>
+        <!-- Map Container -->
+    <div id="map"></div>
+    
+    <!-- Top Left Controls - Organization/Space Dropdowns -->
+    <div class="top-left-controls">
+        <select class="filter-dropdown" id="organization-dropdown" onchange="filterByOrganization(this.value)">
+            <option value="">Select Organization</option>
+        </select>
+        <select class="filter-dropdown" id="space-dropdown" onchange="filterBySpace(this.value)" disabled>
+            <option value="">Select Space</option>
+        </select>
+    </div>
+    
+    <!-- Top Right Controls -->
+    <div class="top-right-controls">
+        <button class="control-btn-small btn-home" onclick="window.location.href='landing.html'">← Home</button>
+        <button class="control-btn-small btn-tour" onclick="window.open('https://drive.google.com/drive/folders/145UnvvoadbqJjg7VjREnkoo-QOGF9gUg', '_blank')">🔄 3DGS</button>
+        <button class="control-btn-small btn-upload" id="btn-upload-location" onclick="showUploadModal()">📍 Upload</button>
+        <button class="control-btn-small btn-logout" id="btn-logout" style="display:none;" onclick="handleLogout()">Logout</button>
+    </div>
+
+
+    <!-- Bottom Left - Zoom Controls -->
+    <div class="bottom-left-controls">
+        <button class="zoom-btn" onclick="map.zoomIn()">+</button>
+        <button class="zoom-btn" onclick="map.zoomOut()">−</button>
+    </div>
+    
+    <!-- Bottom Right - Action Buttons -->
+    <div class="bottom-right-controls">
+        <button class="action-btn" id="edit-control-btn" onclick="toggleAnnotationsPanel()">✏️ Annotate</button>
+        <button class="action-btn" id="map-layer-btn" onclick="toggleMapLayer()">🛰️ Satellite</button>
+        <button class="action-btn" onclick="shareLocation()">🔗 Share</button>
+    </div>
+
+    <!-- Annotations Panel -->
+    <div id="annotations-panel">
+        <h3>✏️ Annotations</h3>
+        <p style="color:#aaa;font-size:0.8rem;margin:0 0 10px 0;">Click a tool, then draw on map</p>
+        <div class="drawing-tools">
+            <button class="draw-tool" onclick="activateDrawTool('marker')">📍 Pin</button>
+            <button class="draw-tool" onclick="activateDrawTool('polyline')">📏 Line</button>
+            <button class="draw-tool" onclick="activateDrawTool('polygon')">⬡ Polygon</button>
+            <button class="draw-tool" onclick="activateDrawTool('rectangle')">▢ Rectangle</button>
+            <button class="draw-tool" onclick="activateDrawTool('circle')">◯ Circle</button>
+        </div>
+        <p style="color:#aaa;font-size:0.8rem;margin:10px 0 5px 0;">Select color:</p>
+        <div class="color-palette">
+            <button class="color-btn" data-color="#FF0000" style="background:#FF0000; border:3px solid white;" onclick="setDrawColor('#FF0000')"></button>
+            <button class="color-btn" data-color="#00FF00" style="background:#00FF00;" onclick="setDrawColor('#00FF00')"></button>
+            <button class="color-btn" data-color="#0000FF" style="background:#0000FF;" onclick="setDrawColor('#0000FF')"></button>
+            <button class="color-btn" data-color="#FFFF00" style="background:#FFFF00;" onclick="setDrawColor('#FFFF00')"></button>
+            <button class="color-btn" data-color="#FF00FF" style="background:#FF00FF;" onclick="setDrawColor('#FF00FF')"></button>
+            <button class="color-btn" data-color="#00FFFF" style="background:#00FFFF;" onclick="setDrawColor('#00FFFF')"></button>
+            <button class="color-btn" data-color="#FFFFFF" style="background:#FFFFFF;" onclick="setDrawColor('#FFFFFF')"></button>
+        </div>
+        <button class="draw-tool" style="width:100%; margin-top:15px;" onclick="clearAllAnnotations()">🗑️ Clear All</button>
+        <button class="draw-tool" style="width:100%; margin-top:10px;" onclick="toggleAnnotationsPanel()">✕ Close Panel</button>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeUploadModal()">&times;</span>
+            <h2>📍 Upload Content</h2>
+            <form id="uploadForm" onsubmit="handleUpload(event)">
+                <div class="form-group">
+                    <label>Organization Name *</label>
+                    <input type="text" id="org-name" required placeholder="Enter organization name">
+                </div>
+
+                <div class="form-group">
+                    <label>Space Name *</label>
+                    <input type="text" id="space-name" required placeholder="Enter space name">
+                </div>
+
+                <div class="form-group">
+                    <label>Media Type *</label>
+                    <div class="media-type-selector">
+                        <button type="button" class="media-type-btn" id="btn-image" onclick="selectMediaType('image')">📷 Image</button>
+                        <button type="button" class="media-type-btn" id="btn-video" onclick="selectMediaType('video')">🎥 Video</button>
+                </div>
+                </div>
+
+                <!-- Image Fields -->
+                <div id="image-fields">
+                <div class="form-group">
+                        <label>Upload Image *</label>
+                        <input type="file" id="image-file" accept="image/*" onchange="handleImageSelect(event)">
+                        <small>📍 GPS coordinates will be extracted automatically</small>
+                </div>
+
+                <div class="form-group">
+                        <label>Coordinates * (auto-extracted or enter manually)</label>
+                        <div class="coords-row">
+                            <input type="text" id="image-lat" placeholder="Latitude">
+                            <input type="text" id="image-lng" placeholder="Longitude">
+                </div>
+                    </div>
+                </div>
+
+                <!-- Video Fields -->
+                <div id="video-fields">
+                <div class="form-group">
+                        <label>Video URL * (YouTube / Google Drive)</label>
+                        <input type="url" id="video-url" placeholder="https://drive.google.com/... or https://youtube.com/...">
+                        <small>📹 Paste your Google Drive or YouTube video link</small>
+                    </div>
+                    <div class="form-group">
+                        <label>360° Image for 3D View (Optional)</label>
+                        <input type="file" id="video-360-image" accept="image/*">
+                        <small>🔄 Upload a 360° panorama or screenshot for the 3D view</small>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Upload</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Video Fullscreen Modal -->
+    <div id="videoModal">
+        <video id="fullscreen-video" controls autoplay></video>
+        <div class="video-controls">
+            <button class="btn-3d" onclick="open3DView()">🔄 Enter 3D View</button>
+            <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
+        </div>
+    </div>
+
+    <!-- 3D Viewer Modal -->
+    <div id="viewer3dModal">
+        <div class="nav-hint">🖱️ Drag to look around • Use scroll to zoom</div>
+        <div id="panorama-viewer"></div>
+        <div class="viewer-controls">
+            <button onclick="resumeVideo()">▶️ Resume Video</button>
+            <button onclick="close3DView()">✕ Close 3D View</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+
+    <script>
+        // Global variables
+        let map;
+        let markersLayer;
+        let selectedMediaType = null;
+        let currentVideoUrl = null;
+        let currentVideoTime = 0;
+        let currentDriveFileId = null;
+        let pannellumViewer = null;
+        let allLocations = [];
+        let streetLayer, satelliteLayer;
+        let currentMapLayer = 'street';
+        let drawnItems;
+        let drawControl;
+        let currentDrawColor = '#FF0000';
+
+            // Initialize map
+        function initMap() {
+            // Center on South Africa with full country view
+            map = L.map('map', { zoomControl: false }).setView([-28.5, 24.5], 5);
+            
+            // Street layer (OpenStreetMap)
+            streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            });
+            
+            // Satellite layer (Esri)
+            satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri, Maxar, GeoEye'
+            });
+            
+            // Add street layer by default
+            streetLayer.addTo(map);
+            
+            markersLayer = L.featureGroup().addTo(map);
+            
+            // Initialize drawing layer
+            drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
+            
+            // Initialize draw control
+            drawControl = new L.Control.Draw({
+                edit: {
+                    featureGroup: drawnItems,
+                    remove: true
+                },
+                draw: {
+                    polygon: true,
+                    polyline: true,
+                    rectangle: true,
+                    circle: true,
+                    marker: true,
+                    circlemarker: false
+                }
+            });
+            
+            // Handle draw events
+            map.on(L.Draw.Event.CREATED, function(e) {
+                const layer = e.layer;
+                layer.setStyle({ color: currentDrawColor, fillColor: currentDrawColor });
+                drawnItems.addLayer(layer);
+                saveDrawnLayer(layer);
+                console.log('✅ Shape drawn and saved');
+            });
+            
+            map.on(L.Draw.Event.EDITED, function(e) {
+                console.log('✏️ Shapes edited');
+                saveAllDrawnLayers();
+            });
+            
+            map.on(L.Draw.Event.DELETED, function(e) {
+                console.log('🗑️ Shapes deleted');
+                saveAllDrawnLayers();
+            });
+            
+            // Load saved annotations
+            loadSavedAnnotations();
+            
+            // Click on map to get coordinates
+            map.on('click', function(e) {
+                if (selectedMediaType === 'image') {
+                    document.getElementById('image-lat').value = e.latlng.lat.toFixed(6);
+                    document.getElementById('image-lng').value = e.latlng.lng.toFixed(6);
+                }
+            });
+            
+            console.log('✅ Map initialized');
+            loadLocations();
+        }
+        
+        // Load locations from database
+        async function loadLocations() {
+            try {
+                const { data, error } = await supabase
+                    .from('locations')
+                    .select(`
+                        *,
+                        organizations(id, name),
+                        spaces(id, name),
+                        location_media(id, file_url, media_type)
+                    `);
+                
+                if (error) throw error;
+                
+                allLocations = data || [];
+                console.log('✅ Loaded', allLocations.length, 'locations');
+                console.log('📍 Location data:', allLocations);
+                
+                // Log each location's details
+                allLocations.forEach((loc, i) => {
+                    console.log(`Location ${i+1}:`, {
+                        name: loc.name,
+                        lat: loc.latitude,
+                        lng: loc.longitude,
+                        org: loc.organizations,
+                        space: loc.spaces,
+                        media: loc.location_media
+                    });
+                });
+                
+                displayLocations(allLocations);
+                loadDropdowns();
+            } catch (err) {
+                console.error('Error loading locations:', err);
+            }
+        }
+        
+        // Display locations on map
+        function displayLocations(locations) {
+            markersLayer.clearLayers();
+            let markersAdded = 0;
+            
+            locations.forEach(loc => {
+                // Check for coordinates
+                if (!loc.latitude || !loc.longitude) {
+                    console.log('⚠️ Skipping location without coords:', loc.name || loc.id);
+                    return;
+                }
+                
+                const media = loc.location_media && loc.location_media[0];
+                const isVideo = media && media.media_type === 'video';
+                const orgName = loc.organizations?.name || loc.name || 'Unknown';
+                const spaceName = loc.spaces?.name || 'Unknown';
+                
+                console.log(`📌 Adding marker: ${orgName} / ${spaceName} at (${loc.latitude}, ${loc.longitude})`);
+                
+                const marker = L.marker([loc.latitude, loc.longitude]);
+                
+                let popupContent = `
+                    <div style="min-width:200px;">
+                        <strong>${orgName}</strong><br>
+                        <em>${spaceName}</em><br><br>
+                `;
+                
+                if (media && media.file_url) {
+                    if (isVideo) {
+                        popupContent += `
+                            <button onclick="playVideo('${media.file_url}')" 
+                                style="width:100%;padding:10px;background:#23d18b;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">
+                                🎥 Play Video
+                            </button>
+                        `;
+            } else {
+                        popupContent += `
+                            <img src="${media.file_url}" style="width:100%;max-height:150px;object-fit:cover;border-radius:5px;">
+                        `;
+                    }
+                } else if (loc.file_url) {
+                    // Fallback to location's own file_url
+                    if (loc.media_type === 'video') {
+                        popupContent += `
+                            <button onclick="playVideo('${loc.file_url}')" 
+                                style="width:100%;padding:10px;background:#23d18b;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">
+                                🎥 Play Video
+                            </button>
+                        `;
+            } else {
+                        popupContent += `
+                            <img src="${loc.file_url}" style="width:100%;max-height:150px;object-fit:cover;border-radius:5px;">
+                        `;
+                    }
+                }
+                
+                popupContent += '</div>';
+                marker.bindPopup(popupContent);
+                marker.addTo(markersLayer);
+                markersAdded++;
+            });
+            
+            console.log(`✅ Added ${markersAdded} markers to map`);
+            
+            // Don't auto-zoom - keep full SA map view
+            // User can manually zoom to markers
+        }
+        
+        // Load dropdown options
+        async function loadDropdowns() {
+            try {
+                // Get all unique org names from locations (format: "OrgName - SpaceName")
+                const orgNamesFromLocations = new Set();
+                const spaceNamesFromLocations = new Set();
+                
+                allLocations.forEach(loc => {
+                    if (loc.name && loc.name.includes(' - ')) {
+                        const parts = loc.name.split(' - ');
+                        if (parts[0]) orgNamesFromLocations.add(parts[0].trim());
+                        if (parts[1]) spaceNamesFromLocations.add(parts[1].trim());
+                    }
+                    // Also add from linked org/space if exists
+                    if (loc.organizations?.name) orgNamesFromLocations.add(loc.organizations.name);
+                    if (loc.spaces?.name) spaceNamesFromLocations.add(loc.spaces.name);
+                });
+                
+                // Also fetch from tables
+                const { data: orgs } = await supabase.from('organizations').select('id, name').order('name');
+                const { data: spaces } = await supabase.from('spaces').select('id, name').order('name');
+                
+                // Merge all org names
+                if (orgs) orgs.forEach(o => orgNamesFromLocations.add(o.name));
+                if (spaces) spaces.forEach(s => spaceNamesFromLocations.add(s.name));
+                
+                // Populate organization dropdown
+                const orgDropdown = document.getElementById('organization-dropdown');
+                orgDropdown.innerHTML = '<option value="">Select Organization</option>';
+                const sortedOrgs = Array.from(orgNamesFromLocations).sort();
+                sortedOrgs.forEach(name => {
+                    orgDropdown.innerHTML += `<option value="${name}">${name}</option>`;
+                });
+                console.log('✅ Loaded organizations:', sortedOrgs);
+                
+                // Space dropdown stays disabled until org is selected
+                const spaceDropdown = document.getElementById('space-dropdown');
+                spaceDropdown.innerHTML = '<option value="">Select Space</option>';
+                spaceDropdown.disabled = true;
+                console.log('✅ Space dropdown ready');
+                
+            } catch (err) {
+                console.error('Error loading dropdowns:', err);
+            }
+        }
+        
+        // Filter by space
+        function filterBySpace(spaceName) {
+            if (!spaceName) {
+                displayLocations(allLocations);
+                return;
+            }
+            const filtered = allLocations.filter(loc => {
+                // Check linked space name
+                if (loc.spaces?.name === spaceName) return true;
+                // Check location name format "Org - Space"
+                if (loc.name && loc.name.includes(' - ')) {
+                    const parts = loc.name.split(' - ');
+                    if (parts[1] && parts[1].trim() === spaceName) return true;
+                }
+                return false;
+            });
+            console.log('🔍 Filtered by space:', spaceName, '- Found:', filtered.length);
+            displayLocations(filtered);
+            
+            // If video with valid URL, auto-play
+            if (filtered.length === 1) {
+                const loc = filtered[0];
+                const media = loc.location_media && loc.location_media[0];
+                const fileUrl = media?.file_url || loc.file_url;
+                const mediaType = media?.media_type || loc.media_type;
+                console.log('📹 Video check:', { fileUrl, mediaType });
+                if (fileUrl && fileUrl.length > 5 && mediaType === 'video') {
+                    playVideo(fileUrl);
+                }
+            }
+        }
+        
+        // Filter by organization
+        function filterByOrganization(orgName) {
+            const spaceDropdown = document.getElementById('space-dropdown');
+            
+            if (!orgName) {
+                displayLocations(allLocations);
+                // Disable space dropdown
+                spaceDropdown.disabled = true;
+                spaceDropdown.innerHTML = '<option value="">Select Space</option>';
+                return;
+            }
+            
+            const filtered = allLocations.filter(loc => {
+                // Check linked org name
+                if (loc.organizations?.name === orgName) return true;
+                // Check location name format "Org - Space"
+                if (loc.name && loc.name.includes(' - ')) {
+                    const parts = loc.name.split(' - ');
+                    if (parts[0] && parts[0].trim() === orgName) return true;
+                }
+                // Check if name starts with org name
+                if (loc.name && loc.name.startsWith(orgName)) return true;
+                return false;
+            });
+            console.log('🔍 Filtered by org:', orgName, '- Found:', filtered.length);
+            displayLocations(filtered);
+            
+            // Enable and populate space dropdown with spaces from this organization
+            spaceDropdown.disabled = false;
+            spaceDropdown.innerHTML = '<option value="">Select Space</option>';
+            
+            const spacesForOrg = new Set();
+            filtered.forEach(loc => {
+                if (loc.spaces?.name) spacesForOrg.add(loc.spaces.name);
+                if (loc.name && loc.name.includes(' - ')) {
+                    const parts = loc.name.split(' - ');
+                    if (parts[1]) spacesForOrg.add(parts[1].trim());
+                }
+            });
+            
+            Array.from(spacesForOrg).sort().forEach(spaceName => {
+                spaceDropdown.innerHTML += `<option value="${spaceName}">${spaceName}</option>`;
+            });
+            console.log('📂 Spaces for org:', Array.from(spacesForOrg));
+        }
+        
+        // Play video fullscreen
+        function playVideo(url) {
+            console.log('🎥 Playing video:', url);
+            
+            if (!url) {
+                alert('No video URL provided');
+                return;
+            }
+            
+            currentVideoUrl = url;
+            const videoModal = document.getElementById('videoModal');
+            const video = document.getElementById('fullscreen-video');
+            
+            // Check if it's a YouTube URL
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                let videoId = '';
+                if (url.includes('youtu.be/')) {
+                    videoId = url.split('youtu.be/')[1].split('?')[0];
+                } else if (url.includes('v=')) {
+                    videoId = url.split('v=')[1].split('&')[0];
+                }
+                
+                if (videoId) {
+                    currentDriveFileId = null; // Clear drive ID
+                    videoModal.innerHTML = `
+                        <iframe 
+                            id="embed-player"
+                            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
+                            style="width:100%;height:100%;border:none;"
+                            allow="autoplay; fullscreen"
+                            allowfullscreen>
+                        </iframe>
+                        <div class="video-controls">
+                            <button class="btn-3d" onclick="open3DViewFromEmbed()">🔄 Enter 3D View</button>
+                            <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
+                        </div>
+                    `;
+                    videoModal.style.display = 'block';
+                    return;
+                }
+            }
+            
+            // Check if it's a Google Drive URL
+            if (url.includes('drive.google.com')) {
+                let fileId = '';
+                // Extract file ID from various Google Drive URL formats
+                if (url.includes('/file/d/')) {
+                    fileId = url.split('/file/d/')[1].split('/')[0];
+                } else if (url.includes('id=')) {
+                    fileId = url.split('id=')[1].split('&')[0];
+                }
+                
+                if (fileId) {
+                    console.log('📁 Google Drive file ID:', fileId);
+                    currentDriveFileId = fileId;
+                    
+                    // Use Google Drive's embedded player
+                    videoModal.innerHTML = `
+                        <div style="width:100%;height:100%;display:flex;flex-direction:column;">
+                            <iframe 
+                                id="gdrive-player"
+                                src="https://drive.google.com/file/d/${fileId}/preview"
+                                style="flex:1;width:100%;border:none;"
+                                allow="autoplay"
+                                allowfullscreen>
+                            </iframe>
+                            <div class="video-controls" style="position:relative;padding:15px;background:rgba(0,0,0,0.9);">
+                                <button class="btn-3d" onclick="open3DViewFromEmbed()">🔄 Enter 3D View</button>
+                                <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
+                            </div>
+                        </div>
+                    `;
+                    videoModal.style.display = 'block';
+                    return;
+                }
+            }
+            
+            // Regular video file (direct URL) - supports 3D frame capture
+            console.log('▶️ Playing direct video URL (3D supported)');
+            
+            // Restore video element if it was replaced
+            videoModal.innerHTML = `
+                <video id="fullscreen-video" controls autoplay style="width:100%;height:100%;object-fit:contain;"></video>
+                <div class="video-controls">
+                    <button class="btn-3d" onclick="open3DView()">🔄 Enter 3D View</button>
+                    <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
+                </div>
+            `;
+            
+            const newVideo = document.getElementById('fullscreen-video');
+            newVideo.src = url;
+            newVideo.currentTime = currentVideoTime;
+            videoModal.style.display = 'block';
+            
+            newVideo.play().catch(err => {
+                console.error('Video play error:', err);
+                alert('Error playing video: ' + err.message + '\n\nURL: ' + url);
+            });
+        }
+        
+        // Close video modal
+        function closeVideoModal() {
+            const videoModal = document.getElementById('videoModal');
+            const video = document.getElementById('fullscreen-video');
+            const embedPlayer = document.getElementById('embed-player');
+            
+            if (embedPlayer) {
+                // Restore original video element structure
+                videoModal.innerHTML = `
+                    <video id="fullscreen-video" controls autoplay></video>
+                    <div class="video-controls">
+                        <button class="btn-3d" onclick="open3DView()">🔄 Enter 3D View</button>
+                        <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
+                    </div>
+                `;
+            } else if (video) {
+                video.pause();
+            }
+            
+            currentVideoTime = 0;
+            videoModal.style.display = 'none';
+        }
+        
+        // Open 3D view (pause video, enter panorama mode)
+        function open3DView() {
+            const video = document.getElementById('fullscreen-video');
+            if (!video) return;
+            
+            video.pause();
+            currentVideoTime = video.currentTime;
+            
+            document.getElementById('videoModal').style.display = 'none';
+            document.getElementById('viewer3dModal').style.display = 'block';
+            
+            // Capture current frame as image for 3D view
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 1920;
+            canvas.height = video.videoHeight || 1080;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const frameImage = canvas.toDataURL('image/jpeg');
+            
+            // Initialize Pannellum with captured frame
+            if (pannellumViewer) {
+                pannellumViewer.destroy();
+            }
+            
+            pannellumViewer = pannellum.viewer('panorama-viewer', {
+                type: 'equirectangular',
+                panorama: frameImage,
+                autoLoad: true,
+                compass: true,
+                showZoomCtrl: true,
+                showFullscreenCtrl: false,
+                hfov: 100,
+                pitch: 0,
+                yaw: 0
+            });
+        }
+        
+        // Open 3D view from embedded video (Google Drive/YouTube)
+        function open3DViewFromEmbed() {
+            document.getElementById('videoModal').style.display = 'none';
+            document.getElementById('viewer3dModal').style.display = 'block';
+            
+            // Check if we have a custom panorama for this video
+            const panoramaMap = JSON.parse(localStorage.getItem('panoramaUrls') || '{}');
+            let panoramaUrl = panoramaMap[currentVideoUrl];
+            let isCustomPanorama = !!panoramaUrl;
+            
+            if (!panoramaUrl) {
+                // Use sample panorama as fallback
+                panoramaUrl = 'https://pannellum.org/images/cerro-toco-0.jpg';
+            }
+            
+            console.log('🔄 Opening 3D view with:', isCustomPanorama ? 'custom panorama' : 'sample panorama');
+            
+            // Update the hint text
+            const hint = document.querySelector('.nav-hint');
+            if (hint) {
+                hint.innerHTML = isCustomPanorama 
+                    ? '🖱️ Drag to look around (Front/Back/Left/Right) • Scroll to zoom'
+                    : '🖱️ Drag to look around • Scroll to zoom • Upload a 360° image for custom view';
+            }
+            
+            // Initialize Pannellum
+            if (pannellumViewer) {
+                pannellumViewer.destroy();
+            }
+            
+            pannellumViewer = pannellum.viewer('panorama-viewer', {
+                type: 'equirectangular',
+                panorama: panoramaUrl,
+                autoLoad: true,
+                compass: true,
+                showZoomCtrl: true,
+                showFullscreenCtrl: false,
+                hfov: 100,
+                pitch: 0,
+                yaw: 0,
+                autoRotate: -2,
+                hotSpots: [
+                    {
+                        pitch: 0,
+                        yaw: 0,
+                        type: 'info',
+                        text: 'Front View'
+                    },
+                    {
+                        pitch: 0,
+                        yaw: 90,
+                        type: 'info',
+                        text: 'Right View'
+                    },
+                    {
+                        pitch: 0,
+                        yaw: 180,
+                        type: 'info',
+                        text: 'Back View'
+                    },
+                    {
+                        pitch: 0,
+                        yaw: -90,
+                        type: 'info',
+                        text: 'Left View'
+                    }
+                ]
+            });
+        }
+        
+        // Resume video from 3D view
+        function resumeVideo() {
+            close3DView();
+            playVideo(currentVideoUrl);
+        }
+        
+        // Close 3D view
+        function close3DView() {
+            document.getElementById('viewer3dModal').style.display = 'none';
+            if (pannellumViewer) {
+                pannellumViewer.destroy();
+                pannellumViewer = null;
+            }
+        }
+        
+        // Toggle annotations panel
+        function toggleAnnotationsPanel() {
+            const panel = document.getElementById('annotations-panel');
+            panel.classList.toggle('visible');
+            // Don't add Leaflet's draw control - use custom buttons only
+        }
+        
+        // Toggle map layer (Street/Satellite)
+        function toggleMapLayer() {
+            const btn = document.getElementById('map-layer-btn');
+            if (currentMapLayer === 'street') {
+                map.removeLayer(streetLayer);
+                map.addLayer(satelliteLayer);
+                currentMapLayer = 'satellite';
+                btn.innerHTML = '🗺️ Street';
+            } else {
+                map.removeLayer(satelliteLayer);
+                map.addLayer(streetLayer);
+                currentMapLayer = 'street';
+                btn.innerHTML = '🛰️ Satellite';
+            }
+            console.log('🗺️ Switched to:', currentMapLayer);
+        }
+        
+        // Activate specific drawing tool
+        function activateDrawTool(toolType) {
+            // Remove existing handler
+            if (map._drawHandler) {
+                map._drawHandler.disable();
+            }
+            
+            let handler;
+            const options = {
+                shapeOptions: {
+                    color: currentDrawColor,
+                    fillColor: currentDrawColor,
+                    fillOpacity: 0.3
+                }
+            };
+            
+            switch(toolType) {
+                case 'marker':
+                    handler = new L.Draw.Marker(map);
+                    break;
+                case 'polyline':
+                    handler = new L.Draw.Polyline(map, options);
+                    break;
+                case 'polygon':
+                    handler = new L.Draw.Polygon(map, options);
+                    break;
+                case 'rectangle':
+                    handler = new L.Draw.Rectangle(map, options);
+                    break;
+                case 'circle':
+                    handler = new L.Draw.Circle(map, options);
+                    break;
+            }
+            
+            if (handler) {
+                handler.enable();
+                map._drawHandler = handler;
+                console.log('🖊️ Drawing tool activated:', toolType);
+            }
+        }
+        
+        // Set drawing color
+        function setDrawColor(color) {
+            currentDrawColor = color;
+            // Update button styles
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.style.border = btn.dataset.color === color ? '3px solid white' : '2px solid rgba(255,255,255,0.5)';
+            });
+            console.log('🎨 Color set to:', color);
+        }
+        
+        // Save drawn layer to localStorage
+        function saveDrawnLayer(layer) {
+            saveAllDrawnLayers();
+        }
+        
+        // Save all drawn layers
+        function saveAllDrawnLayers() {
+            const layers = [];
+            drawnItems.eachLayer(function(layer) {
+                const geoJson = layer.toGeoJSON();
+                geoJson.properties = geoJson.properties || {};
+                geoJson.properties.color = layer.options.color || currentDrawColor;
+                layers.push(geoJson);
+            });
+            localStorage.setItem('mapAnnotations', JSON.stringify(layers));
+            console.log('💾 Saved', layers.length, 'annotations');
+        }
+        
+        // Load saved annotations
+        function loadSavedAnnotations() {
+            const saved = localStorage.getItem('mapAnnotations');
+            if (saved) {
+                try {
+                    const layers = JSON.parse(saved);
+                    layers.forEach(geoJson => {
+                        const color = geoJson.properties?.color || '#FF0000';
+                        const layer = L.geoJSON(geoJson, {
+                            style: { color: color, fillColor: color, fillOpacity: 0.3 },
+                            pointToLayer: function(feature, latlng) {
+                                return L.marker(latlng);
+                            }
+                        });
+                        layer.eachLayer(l => {
+                            l.options.color = color;
+                            drawnItems.addLayer(l);
+                        });
+                    });
+                    console.log('📂 Loaded', layers.length, 'saved annotations');
+                } catch (e) {
+                    console.error('Error loading annotations:', e);
+                }
+            }
+        }
+        
+        // Clear all annotations
+        function clearAllAnnotations() {
+            if (confirm('Delete all annotations?')) {
+                drawnItems.clearLayers();
+                localStorage.removeItem('mapAnnotations');
+                console.log('🗑️ All annotations cleared');
+            }
+        }
+        
+        // Upload modal functions
+        function showUploadModal() {
+            document.getElementById('uploadModal').style.display = 'block';
+        }
+        
+        function closeUploadModal() {
+                document.getElementById('uploadModal').style.display = 'none';
+            document.getElementById('uploadForm').reset();
+            document.getElementById('image-fields').classList.remove('active');
+            document.getElementById('video-fields').classList.remove('active');
+            document.getElementById('btn-image').classList.remove('active');
+            document.getElementById('btn-video').classList.remove('active');
+            selectedMediaType = null;
+        }
+        
+        // Select media type
+        function selectMediaType(type) {
+            selectedMediaType = type;
+            
+            document.getElementById('btn-image').classList.toggle('active', type === 'image');
+            document.getElementById('btn-video').classList.toggle('active', type === 'video');
+            document.getElementById('image-fields').classList.toggle('active', type === 'image');
+            document.getElementById('video-fields').classList.toggle('active', type === 'video');
+        }
+        
+        // Handle image select - extract GPS
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (typeof EXIF !== 'undefined') {
+                EXIF.getData(file, function() {
+                    const lat = EXIF.getTag(this, 'GPSLatitude');
+                    const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
+                    const lng = EXIF.getTag(this, 'GPSLongitude');
+                    const lngRef = EXIF.getTag(this, 'GPSLongitudeRef');
+                    
+                    if (lat && lng && Array.isArray(lat) && Array.isArray(lng)) {
+                        let latDecimal = lat[0] + (lat[1] || 0)/60 + (lat[2] || 0)/3600;
+                        let lngDecimal = lng[0] + (lng[1] || 0)/60 + (lng[2] || 0)/3600;
+                        
+                        if (latRef === 'S') latDecimal = -latDecimal;
+                        if (lngRef === 'W') lngDecimal = -lngDecimal;
+                        
+                        document.getElementById('image-lat').value = latDecimal.toFixed(6);
+                        document.getElementById('image-lng').value = lngDecimal.toFixed(6);
+                        
+                        alert('✅ GPS extracted!\nLat: ' + latDecimal.toFixed(6) + '\nLng: ' + lngDecimal.toFixed(6));
+                    } else {
+                        alert('⚠️ No GPS data found in image. Please enter coordinates manually or click on map.');
+                    }
+                });
+            }
+        }
+        
+        // Handle upload
+        async function handleUpload(event) {
+            event.preventDefault();
+            
+            const orgName = document.getElementById('org-name').value.trim();
+            const spaceName = document.getElementById('space-name').value.trim();
+            
+            if (!selectedMediaType) {
+                alert('Please select Image or Video');
+                return;
+            }
+            
+            try {
+                // Create or get organization
+                let org = null;
+                const { data: existingOrg, error: orgFetchErr } = await supabase
+                    .from('organizations')
+                    .select('id')
+                    .eq('name', orgName)
+                    .maybeSingle();
+                
+                if (existingOrg) {
+                    org = existingOrg;
+                } else {
+                    const { data: newOrg, error: orgErr } = await supabase
+                        .from('organizations')
+                        .insert({ name: orgName })
+                        .select()
+                        .single();
+                    if (orgErr) throw orgErr;
+                    org = newOrg;
+                }
+                
+                // Create or get space
+                let space = null;
+                const { data: existingSpace, error: spaceFetchErr } = await supabase
+                    .from('spaces')
+                    .select('id')
+                    .eq('name', spaceName)
+                    .maybeSingle();
+                
+                if (existingSpace) {
+                    space = existingSpace;
+                } else {
+                    const { data: newSpace, error: spaceErr } = await supabase
+                        .from('spaces')
+                        .insert({ name: spaceName })
+                        .select()
+                        .single();
+                    if (spaceErr) throw spaceErr;
+                    space = newSpace;
+                }
+                
+                let mediaUrl = '';
+                let lat = null;
+                let lng = null;
+                
+                if (selectedMediaType === 'image') {
+                    // Get coordinates
+                    lat = parseFloat(document.getElementById('image-lat').value);
+                    lng = parseFloat(document.getElementById('image-lng').value);
+                    
+                    if (isNaN(lat) || isNaN(lng)) {
+                        alert('Please provide valid coordinates for the image');
+                        return;
+                    }
+                    
+                    // Upload image to Supabase storage
+                    const file = document.getElementById('image-file').files[0];
+                    if (!file) {
+                        alert('Please select an image file');
+                        return;
+                    }
+                    
+                    const fileName = `locations/${Date.now()}_${file.name}`;
+                    const { data: uploadData, error: uploadErr } = await supabase.storage
+                        .from('location-files')
+                        .upload(fileName, file);
+                    
+                    if (uploadErr) throw uploadErr;
+                    
+                    const { data: urlData } = supabase.storage.from('location-files').getPublicUrl(fileName);
+                    mediaUrl = urlData.publicUrl;
+                    
+                } else if (selectedMediaType === 'video') {
+                    const videoUrl = document.getElementById('video-url').value.trim();
+                    const panoramaFile = document.getElementById('video-360-image').files[0];
+                    
+                    if (!videoUrl) {
+                        alert('Please provide a video URL');
+                        return;
+                    }
+                    
+                    mediaUrl = videoUrl;
+                    
+                    // Upload 360 image if provided
+                    if (panoramaFile) {
+                        const fileName = `panoramas/${Date.now()}_${panoramaFile.name}`;
+                        const { data: uploadData, error: uploadErr } = await supabase.storage
+                            .from('location-files')
+                            .upload(fileName, panoramaFile);
+                        
+                        if (uploadErr) {
+                            console.error('Panorama upload error:', uploadErr);
+                        } else {
+                            const { data: urlData } = supabase.storage.from('location-files').getPublicUrl(fileName);
+                            // Store panorama URL - we'll save this with the location
+                            window.uploadedPanoramaUrl = urlData.publicUrl;
+                            console.log('✅ 360° image uploaded to:', window.uploadedPanoramaUrl);
+                        }
+                    }
+                    
+                    // Videos don't need coordinates - use default or null
+                    lat = null;
+                    lng = null;
+                }
+                
+                // Create location
+                const { data: location, error: locErr } = await supabase
+                    .from('locations')
+                    .insert({
+                        name: `${orgName} - ${spaceName}`,
+                        latitude: lat,
+                        longitude: lng,
+                        organization_id: org.id,
+                        space_id: space.id
+                    })
+                    .select()
+                    .single();
+                
+                if (locErr) throw locErr;
+                
+                // Create media entry
+                const { error: mediaErr } = await supabase
+                    .from('location_media')
+                    .insert({
+                        location_id: location.id,
+                        file_url: mediaUrl,
+                        media_type: selectedMediaType
+                    });
+                
+                // If panorama image was uploaded, store the mapping
+                if (window.uploadedPanoramaUrl) {
+                    // Store panorama URL mapping in localStorage
+                    const panoramaMap = JSON.parse(localStorage.getItem('panoramaUrls') || '{}');
+                    panoramaMap[mediaUrl] = window.uploadedPanoramaUrl;
+                    localStorage.setItem('panoramaUrls', JSON.stringify(panoramaMap));
+                    console.log('✅ Saved panorama mapping for:', mediaUrl);
+                    window.uploadedPanoramaUrl = null;
+                }
+                
+                if (mediaErr) throw mediaErr;
+                
+                alert('✅ Upload successful!');
+                closeUploadModal();
+                loadLocations(); // Refresh
+                
+            } catch (err) {
+                console.error('Upload error:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+        
+        // Share location
+        function shareLocation() {
+            const url = window.location.href;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => alert('Link copied!'));
+            } else {
+                prompt('Copy this link:', url);
+            }
+        }
+        
+        // Logout
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            window.location.href = 'landing.html';
+        }
+        
+        // Close modal on outside click
+        window.onclick = function(e) {
+            if (e.target.id === 'uploadModal') closeUploadModal();
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🗺️ Map page loaded');
+            initMap();
+            
+            // Auth state
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                document.getElementById('btn-logout').style.display = session ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
