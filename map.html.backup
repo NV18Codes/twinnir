@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin Platform</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Leaflet Draw CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+    <!-- Pannellum CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        /* Map Container */
+        #map {
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Panorama Container */
+        #panorama-container {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10000;
+        }
+
+        #panorama {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Top-Left Controls */
+        .top-left-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 250px;
+        }
+
+        .filter-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-box label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .filter-box select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background: white;
+        }
+
+        /* Top-Right Controls (Busby Style) */
+        .tour-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+        }
+
+        .tour-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .tour-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .tour-btn-upload {
+            background: #23d18b;
+            color: white;
+        }
+
+        .tour-btn-upload:hover {
+            background: #1fb870;
+        }
+
+        .tour-btn-logout {
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+        }
+
+        .tour-btn-logout:hover {
+            background: rgba(200, 33, 49, 1);
+        }
+
+        .tour-btn-home {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        .tour-btn-home:hover {
+            background: rgba(0, 0, 0, 1);
+        }
+
+        /* Bottom-Left Controls */
+        .bottom-left-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+
+        .map-layer-btn {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .map-layer-btn:hover {
+            background: rgba(0, 0, 0, 1);
+            transform: translateY(-2px);
+        }
+
+        .map-layer-btn.active {
+            background: #23d18b;
+        }
+
+        /* Bottom-Right Controls */
+        .bottom-right-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .control-btn-round {
+            width: 45px;
+            height: 45px;
+            background: rgba(0, 0, 0, 0.75);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .control-btn-round:hover {
+            background: rgba(0, 0, 0, 1);
+            transform: translateY(-2px);
+        }
+
+        .control-btn-round.active {
+            background: #23d18b;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 20000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.75rem;
+            background: #23d18b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-submit:hover {
+            background: #1fb870;
+        }
+
+        #location-map-preview {
+            width: 100%;
+            height: 300px;
+            margin-top: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+
+        /* Video Modal */
+        #videoModal {
+            background-color: rgba(0, 0, 0, 0.95);
+        }
+
+        #videoContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .video-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 20001;
+        }
+
+        /* Back to Map Button (in 3D view) */
+        #back-to-map-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10001;
+            padding: 12px 24px;
+            background: rgba(35, 209, 139, 0.9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #back-to-map-btn:hover {
+            background: rgba(35, 209, 139, 1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Panorama Container (Hidden by default) -->
+    <div id="panorama-container">
+        <div id="panorama"></div>
+        <button id="back-to-map-btn">🗺️ Back to Map</button>
+    </div>
+
+    <!-- Top-Left Controls -->
+    <div class="top-left-controls">
+        <div class="filter-box">
+            <label for="organization-filter">Organization</label>
+            <select id="organization-filter">
+                <option value="">All Organizations</option>
+            </select>
+        </div>
+        <div class="filter-box">
+            <label for="space-filter">Space</label>
+            <select id="space-filter">
+                <option value="">All Spaces</option>
+            </select>
+        </div>
+        <button class="tour-btn tour-btn-home" onclick="window.location.href='landing.html'">← Return to Home</button>
+    </div>
+
+    <!-- Top-Right Controls (Busby Style) -->
+    <div class="tour-controls">
+        <button id="tour-upload-btn" class="tour-btn tour-btn-upload" style="display: none;"
+            onclick="showUploadModal()">📍 Upload Location</button>
+        <button id="tour-logout-btn" class="tour-btn tour-btn-logout" style="display: none;"
+            onclick="handleLogout()">Logout</button>
+    </div>
+
+    <!-- Bottom-Left Controls (Layer Toggle) -->
+    <div class="bottom-left-controls">
+        <button id="satellite-btn" class="map-layer-btn active" onclick="toggleLayer('satellite')">🛰️
+            Satellite</button>
+        <button id="street-btn" class="map-layer-btn" onclick="toggleLayer('street')">🗺️ Street</button>
+    </div>
+
+    <!-- Bottom-Right Controls (Annotations & Zoom) -->
+    <div class="bottom-right-controls">
+        <button id="annotate-btn" class="control-btn-round" title="Annotations"
+            onclick="toggleAnnotations()">✏️</button>
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+            <button class="control-btn-round" onclick="map.zoomIn()" title="Zoom In">+</button>
+            <button class="control-btn-round" onclick="map.zoomOut()" title="Zoom Out">−</button>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeUploadModal()">&times;</span>
+            <h2 style="margin-top: 0;">Upload Location</h2>
+            <form id="uploadLocationForm" onsubmit="handleLocationUpload(event)">
+                <div class="form-group">
+                    <label for="organization-name">Organization Name *</label>
+                    <input type="text" id="organization-name" required placeholder="Enter organization name">
+                </div>
+
+                <div class="form-group">
+                    <label for="space-name">Space Name *</label>
+                    <input type="text" id="space-name" required placeholder="Enter space name">
+                </div>
+
+                <div class="form-group">
+                    <label for="location-name">Location Name *</label>
+                    <input type="text" id="location-name" required placeholder="Enter location name">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" required>
+                        <option value="">Select category</option>
+                        <option value="asset">Asset</option>
+                        <option value="space">Space</option>
+                        <option value="property">Property</option>
+                        <option value="asset_type">Asset Type</option>
+                        <option value="space_type">Space Type</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location-description">Description</label>
+                    <textarea id="location-description" rows="3" placeholder="Enter description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Media Upload (Optional)</label>
+                    <input type="file" id="location-file" accept="image/*,video/*" onchange="handleFileSelect(event)">
+                    <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ddd;">
+                        <label style="font-weight: 600; color: #666; font-size: 0.9rem;">Or provide a video URL:</label>
+                        <input type="url" id="location-url"
+                            placeholder="https://drive.google.com/... or direct video URL">
+                    </div>
+                    <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.5rem;">
+                        📎 Upload: Images (JPG, PNG) or Videos (MP4)<br>
+                        🔗 Video URL: Google Drive link or direct video URL<br>
+                        📍 GPS coordinates will be automatically extracted from images
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label>Coordinates *</label>
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)"
+                            onchange="showLocationOnMap()" oninput="showLocationOnMap()">
+                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)"
+                            onchange="showLocationOnMap()" oninput="showLocationOnMap()">
+                    </div>
+                    <small style="color: #666; font-size: 0.85rem;">South Africa bounds: Lat -35 to -22, Lng 16 to
+                        33</small>
+                    <div id="location-map-preview"></div>
+                </div>
+
+                <button type="submit" class="btn-submit">Upload Location</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="modal">
+        <span class="video-close" onclick="closeVideoModal()">&times;</span>
+        <div id="videoContainer"></div>
+    </div>
+
+    <!-- Load Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.js"></script>
+    <script src="config.js"></script>
+
+    <script>
+        // Global variables
+        let map = null;
+        let markers = [];
+        let previewMap = null;
+        let previewMarker = null;
+        let pannellumViewer = null;
+        const southAfricaBounds = [
+            [-35, 16],  // Southwest
+            [-22, 33]   // Northeast
+        ];
+
+        map = L.map('map', {
+            maxBounds: southAfricaBounds,
+            maxBoundsViscosity: 1.0,
+            minZoom: 5
+        }).setView([-28.5, 24.5], 6);
+
+        // Satellite layer
+        satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri',
+            maxZoom: 19
+        });
+
+        // Street layer
+        streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        });
+
+        // Add default layer (satellite)
+        satelliteLayer.addTo(map);
+
+        // Initialize drawn items layer for annotations
+        drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        console.log('🗺️ Map initialized with South Africa bounds');
+        loadLocations();
+        loadAnnotations();
+        }
+
+        // Toggle map layer (satellite/street)
+        function toggleLayer(layerType) {
+            if (layerType === 'satellite' && currentLayer !== 'satellite') {
+                map.removeLayer(streetLayer);
+                map.addLayer(satelliteLayer);
+                currentLayer = 'satellite';
+                document.getElementById('satellite-btn').classList.add('active');
+                document.getElementById('street-btn').classList.remove('active');
+            } else if (layerType === 'street' && currentLayer !== 'street') {
+                map.removeLayer(satelliteLayer);
+                map.addLayer(streetLayer);
+                currentLayer = 'street';
+                document.getElementById('street-btn').classList.add('active');
+                document.getElementById('satellite-btn').classList.remove('active');
+            }
+        }
+
+        // Toggle annotations
+        function toggleAnnotations() {
+            annotationsEnabled = !annotationsEnabled;
+            const btn = document.getElementById('annotate-btn');
+
+            if (annotationsEnabled) {
+                btn.classList.add('active');
+
+                // Add draw control if not already added
+                if (!drawControl) {
+                    drawControl = new L.Control.Draw({
+                        edit: {
+                            featureGroup: drawnItems
+                        },
+                        draw: {
+                            polygon: true,
+                            polyline: true,
+                            rectangle: true,
+                            circle: true,
+                            marker: true,
+                            circlemarker: false
+                        }
+                    });
+                }
+                map.addControl(drawControl);
+            } else {
+                btn.classList.remove('active');
+                if (drawControl) {
+                    map.removeControl(drawControl);
+                }
+            }
+        }
+
+        // Handle drawing created
+        map.on(L.Draw.Event.CREATED, async function (event) {
+            const layer = event.layer;
+            drawnItems.addLayer(layer);
+
+            // Save to Supabase
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return;
+
+                const geoJSON = layer.toGeoJSON();
+
+                const { error } = await supabase
+                    .from('annotations')
+                    .insert([{
+                        user_id: user.id,
+                        geo_json: geoJSON,
+                        color: '#FF0000'
+                    }]);
+
+                if (error) throw error;
+                console.log('✅ Annotation saved');
+            } catch (error) {
+                console.error('❌ Error saving annotation:', error);
+            }
+        });
+
+        // Load annotations from Supabase
+        async function loadAnnotations() {
+            try {
+                const { data: annotations, error } = await supabase
+                    .from('annotations')
+                    .select('*');
+
+                if (error) throw error;
+
+                annotations.forEach(annotation => {
+                    const layer = L.geoJSON(annotation.geo_json, {
+                        style: {
+                            color: annotation.color || '#FF0000'
+                        }
+                    });
+                    drawnItems.addLayer(layer);
+                });
+
+                console.log(`✅ Loaded ${annotations.length} annotations`);
+            } catch (error) {
+                console.error('❌ Error loading annotations:', error);
+            }
+        }
+
+        // Load locations from Supabase
+        async function loadLocations() {
+            try {
+                const { data: locations, error } = await supabase
+                    .from('locations')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Clear existing markers
+                markers.forEach(marker => map.removeLayer(marker));
+                markers = [];
+
+                // Populate filter dropdowns
+                populateFilters(locations);
+
+                // Filter and display locations
+                const filteredLocations = filterLocations(locations);
+                displayLocations(filteredLocations);
+
+                console.log(`✅ Loaded ${filteredLocations.length} locations`);
+            } catch (error) {
+                console.error('❌ Error loading locations:', error);
+            }
+        }
+
+        // Populate filter dropdowns
+        function populateFilters(locations) {
+            const organizations = [...new Set(locations.map(l => l.organization_name).filter(Boolean))];
+            const spaces = [...new Set(locations.map(l => l.space_name).filter(Boolean))];
+
+            const orgSelect = document.getElementById('organization-filter');
+            const spaceSelect = document.getElementById('space-filter');
+
+            orgSelect.innerHTML = '<option value="">All Organizations</option>';
+            spaceSelect.innerHTML = '<option value="">All Spaces</option>';
+
+            organizations.forEach(org => {
+                const option = document.createElement('option');
+                option.value = org;
+                option.textContent = org;
+                orgSelect.appendChild(option);
+            });
+
+            spaces.forEach(space => {
+                const option = document.createElement('option');
+                option.value = space;
+                option.textContent = space;
+                spaceSelect.appendChild(option);
+            });
+        }
+
+        // Filter locations
+        function filterLocations(locations) {
+            return locations.filter(location => {
+                const orgMatch = !currentFilters.organization || location.organization_name === currentFilters.organization;
+                const spaceMatch = !currentFilters.space || location.space_name === currentFilters.space;
+                return orgMatch && spaceMatch;
+            });
+        }
+
+        // Display locations on map
+        function displayLocations(locations) {
+            const blueIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            locations.forEach(location => {
+                const lat = parseFloat(location.latitude);
+                const lng = parseFloat(location.longitude);
+
+                if (isNaN(lat) || isNaN(lng)) return;
+
+                let popupContent = `<div style="min-width: 250px;">
+            <b style="font-size: 1.1rem; color: #333;">${location.name || 'Unnamed'}</b><br>`;
+
+                if (location.organization_name) {
+                    popupContent += `<div style="font-size: 0.9rem; color: #666;"><strong>Org:</strong> ${location.organization_name}</div>`;
+                }
+
+                if (location.space_name) {
+                    popupContent += `<div style="font-size: 0.9rem; color: #666;"><strong>Space:</strong> ${location.space_name}</div>`;
+                }
+
+                if (location.category) {
+                    popupContent += `<div style="font-size: 0.9rem; color: #666;"><strong>Category:</strong> ${location.category}</div>`;
+                }
+
+                if (location.description) {
+                    popupContent += `<p style="margin: 0.5rem 0; color: #666;">${location.description}</p>`;
+                }
+
+                if (location.file_url) {
+                    if (location.media_type === 'image' || location.media_type === '360') {
+                        popupContent += `<img src="${location.file_url}" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="view3D('${location.file_url}')" title="Click to view in 3D">`;
+                        popupContent += `<button onclick="view3D('${location.file_url}')" style="width: 100%; padding: 8px; margin-top: 8px; background: #23d18b; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">🌐 View in 3D</button>`;
+                    } else if (location.media_type === 'video') {
+                        popupContent += `<button onclick='playVideo(${JSON.stringify(location)})' style="width: 100%; padding: 8px; margin-top: 8px; background: #2f98ca; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">▶️ Play Video</button>`;
+                    }
+                }
+
+                popupContent += `</div>`;
+
+                const marker = L.marker([lat, lng], { icon: blueIcon })
+                    .addTo(map)
+                    .bindPopup(popupContent);
+
+                markers.push(marker);
+            });
+
+            if (markers.length > 0) {
+                const group = L.featureGroup(markers);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // View 3D with Pannellum
+        function view3D(imageUrl) {
+            document.getElementById('map').style.display = 'none';
+            document.querySelector('.top-left-controls').style.display = 'none';
+            document.querySelector('.tour-controls').style.display = 'none';
+            document.querySelector('.bottom-left-controls').style.display = 'none';
+            document.querySelector('.bottom-right-controls').style.display = 'none';
+            document.getElementById('panorama-container').style.display = 'block';
+
+            if (pannellumViewer) {
+                try {
+                    pannellumViewer.destroy();
+                } catch (e) { console.log('Error destroying viewer:', e); }
+            }
+
+            pannellumViewer = pannellum.viewer('panorama', {
+                "type": "equirectangular",
+                "panorama": imageUrl,
+                "autoLoad": true,
+                "compass": true,
+                "mouseZoom": true,
+                "showControls": true
+            });
+        }
+
+        // Back to map from 3D view
+        document.getElementById('back-to-map-btn').addEventListener('click', () => {
+            document.getElementById('panorama-container').style.display = 'none';
+            document.getElementById('map').style.display = 'block';
+            document.querySelector('.top-left-controls').style.display = 'flex';
+            document.querySelector('.tour-controls').style.display = 'flex';
+            document.querySelector('.bottom-left-controls').style.display = 'flex';
+            document.querySelector('.bottom-right-controls').style.display = 'flex';
+
+            if (pannellumViewer) {
+                try {
+                    pannellumViewer.destroy();
+                    pannellumViewer = null;
+                } catch (e) { console.log('Error destroying viewer:', e); }
+            }
+        });
+
+        // Play video
+        function playVideo(location) {
+            const modal = document.getElementById('videoModal');
+            const container = document.getElementById('videoContainer');
+
+            if (!modal || !container) return;
+
+            let url = location.file_url;
+            modal.style.display = 'block';
+
+            const add3dButton = () => {
+                const existingBtn = document.getElementById('enter-3d-btn');
+                if (existingBtn) existingBtn.remove();
+
+                const btn = document.createElement('button');
+                btn.id = 'enter-3d-btn';
+                btn.innerHTML = 'Enter 3D View 👉';
+                btn.style.cssText = 'position:absolute; bottom:40px; right:40px; z-index:30002; padding:12px 24px; background:rgba(35, 209, 139, 0.9); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px; box-shadow:0 4px 12px rgba(0,0,0,0.5);';
+
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    closeVideoModal();
+                    if (location.file_url && location.media_type === '360') {
+                        view3D(location.file_url);
+                    }
+                };
+                container.appendChild(btn);
+            };
+
+            if (url.includes('drive.google.com')) {
+                let fileId = null;
+
+                if (url.includes('/file/d/')) {
+                    fileId = url.split('/file/d/')[1].split('/')[0].split('?')[0];
+                } else if (url.includes('id=')) {
+                    fileId = url.split('id=')[1].split('&')[0];
+                }
+
+                if (fileId) {
+                    container.innerHTML = `<iframe src="https://drive.google.com/file/d/${fileId}/preview" allow="autoplay; fullscreen" allowfullscreen style="width:100vw;height:100vh;border:none;"></iframe>`;
+                    add3dButton();
+                } else {
+                    container.innerHTML = '<p style="color:white;">Invalid Google Drive Link</p>';
+                }
+            } else {
+                container.innerHTML = `
+            <video controls autoplay style="max-width:100%; max-height:100vh;">
+                <source src="${url}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+                add3dButton();
+            }
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const container = document.getElementById('videoContainer');
+            if (modal) {
+                modal.style.display = 'none';
+                if (container) container.innerHTML = '';
+            }
+        }
+
+        // Check authentication state
+        async function checkAuthState() {
+            const { data: { session } } = await supabase.auth.getSession();
+            const isAuthenticated = !!session;
+
+            document.getElementById('tour-upload-btn').style.display = isAuthenticated ? 'block' : 'none';
+            document.getElementById('tour-logout-btn').style.display = isAuthenticated ? 'block' : 'none';
+        }
+
+        // Logout
+        async function handleLogout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+
+                alert('Logged out successfully');
+                window.location.href = 'landing.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Error logging out');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('organization-filter').addEventListener('change', (e) => {
+                currentFilters.organization = e.target.value;
+                loadLocations();
+            });
+
+            document.getElementById('space-filter').addEventListener('change', (e) => {
+                currentFilters.space = e.target.value;
+                loadLocations();
+            });
+
+            supabase.auth.onAuthStateChange((event, session) => {
+                checkAuthState();
+            });
+        }
+
+        function showUploadModal() {
+            document.getElementById('uploadModal').style.display = 'block';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+            document.getElementById('uploadLocationForm').reset();
+            if (previewMap) {
+                previewMap.remove();
+                previewMap = null;
+                previewMarker = null;
+            }
+        }
+
+        // Handle file selection for EXIF extraction
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+
+            if (typeof EXIF !== 'undefined') {
+                EXIF.getData(file, function () {
+                    const gpsLat = EXIF.getTag(this, 'GPSLatitude');
+                    const gpsLatRef = EXIF.getTag(this, 'GPSLatitudeRef');
+                    const gpsLng = EXIF.getTag(this, 'GPSLongitude');
+                    const gpsLngRef = EXIF.getTag(this, 'GPSLongitudeRef');
+
+                    if (gpsLat && Array.isArray(gpsLat) && gpsLng && Array.isArray(gpsLng)) {
+                        let latDecimal = gpsLat[0] + (gpsLat[1] || 0) / 60 + (gpsLat[2] || 0) / 3600;
+                        let lngDecimal = gpsLng[0] + (gpsLng[1] || 0) / 60 + (gpsLng[2] || 0) / 3600;
+
+                        if (gpsLatRef === 'S') latDecimal = -latDecimal;
+                        if (gpsLngRef === 'W') lngDecimal = -lngDecimal;
+
+                        if (latDecimal >= -35 && latDecimal <= -22 && lngDecimal >= 16 && lngDecimal <= 33) {
+                            document.getElementById('location-lat').value = latDecimal.toFixed(6);
+                            document.getElementById('location-lng').value = lngDecimal.toFixed(6);
+
+                            setTimeout(() => {
+                                showLocationOnMap();
+                            }, 100);
+
+                            alert('✅ GPS coordinates extracted from image!');
+                        } else {
+                            alert('⚠️ GPS coordinates found but outside South Africa bounds.');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Show location on preview map
+        function showLocationOnMap() {
+            const latInput = document.getElementById('location-lat');
+            const lngInput = document.getElementById('location-lng');
+            const mapPreview = document.getElementById('location-map-preview');
+
+            if (!latInput || !lngInput) return;
+
+            const lat = parseFloat(latInput.value);
+            const lng = parseFloat(lngInput.value);
+
+            if (lat && lng && lat >= -35 && lat <= -22 && lng >= 16 && lng <= 33) {
+                mapPreview.style.display = 'block';
+
+                if (!previewMap) {
+                    previewMap = L.map('location-map-preview').setView([lat, lng], 13);
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: '© Esri',
+                        maxZoom: 19
+                    }).addTo(previewMap);
+                } else {
+                    previewMap.setView([lat, lng], 15);
+                }
+
+                if (previewMarker) {
+                    previewMap.removeLayer(previewMarker);
+                }
+
+                const blueIcon = L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                });
+
+                previewMarker = L.marker([lat, lng], { icon: blueIcon })
+                    .addTo(previewMap)
+                    .bindPopup('Location to upload')
+                    .openPopup();
+
+                setTimeout(() => {
+                    if (previewMap) {
+                        previewMap.invalidateSize();
+                    }
+                }, 100);
+            } else if (mapPreview && (!lat || !lng)) {
+                mapPreview.style.display = 'none';
+            }
+        }
+
+        // Handle location upload
+        async function handleLocationUpload(event) {
+            event.preventDefault();
+
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                alert('Please sign in to upload locations');
+                window.location.href = 'landing.html';
+                return;
+            }
+
+            const organizationName = document.getElementById('organization-name').value.trim();
+            const spaceName = document.getElementById('space-name').value.trim();
+            const name = document.getElementById('location-name').value.trim();
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('location-description').value.trim();
+            let lat = parseFloat(document.getElementById('location-lat').value);
+            let lng = parseFloat(document.getElementById('location-lng').value);
+            const file = document.getElementById('location-file').files[0];
+            const url = document.getElementById('location-url').value.trim();
+
+            if (!lat || !lng || lat < -35 || lat > -22 || lng < 16 || lng > 33) {
+                alert('Please provide valid coordinates within South Africa bounds');
+                return;
+            }
+
+            try {
+                let fileUrl = url || null;
+                let mediaType = null;
+
+                if (file) {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    const filePath = `locations/${fileName}`;
+
+                    const { data: uploadData, error: uploadError } = await supabase.storage
+                        .from('location-files')
+                        .upload(filePath, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('location-files')
+                        .getPublicUrl(filePath);
+
+                    fileUrl = publicUrl;
+
+                    const fileType = file.type.toLowerCase();
+                    if (fileType.startsWith('image/')) {
+                        mediaType = 'image';
+                    } else if (fileType.startsWith('video/')) {
+                        mediaType = 'video';
+                    }
+                } else if (url) {
+                    mediaType = 'video';
+                }
+
+                const { data, error } = await supabase
+                    .from('locations')
+                    .insert([{
+                        user_id: user.id,
+                        organization_name: organizationName,
+                        space_name: spaceName,
+                        name: name,
+                        category: category,
+                        description: description,
+                        latitude: lat,
+                        longitude: lng,
+                        file_url: fileUrl,
+                        media_type: mediaType
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                alert('✅ Location uploaded successfully!');
+                closeUploadModal();
+                loadLocations();
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Error uploading location: ' + (error.message || 'Unknown error'));
+            }
+        }
+    </script>
+
+</body>
+
+</html>

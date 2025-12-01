@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    
+
     <style>
         * {
             margin: 0;
@@ -54,10 +55,6 @@
             align-items: center;
             cursor: pointer;
             transition: opacity 0.2s;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 6px 16px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .logo-container:hover {
@@ -85,7 +82,8 @@
             align-items: center;
         }
 
-        .btn-signin, .btn-signup {
+        .btn-signin,
+        .btn-signup {
             background: transparent;
             border: 2px solid #23d18b;
             color: #23d18b;
@@ -98,7 +96,8 @@
             display: inline-block;
         }
 
-        .btn-signin.hidden, .btn-signup.hidden {
+        .btn-signin.hidden,
+        .btn-signup.hidden {
             display: none !important;
         }
 
@@ -124,7 +123,7 @@
         }
 
         .db-item:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transform: translateY(-2px);
         }
 
@@ -195,7 +194,8 @@
             border: 1px solid #e0e0e0;
         }
 
-        .media-item img, .media-item video {
+        .media-item img,
+        .media-item video {
             width: 100%;
             height: 150px;
             object-fit: cover;
@@ -207,7 +207,8 @@
             font-size: 0.85rem;
         }
 
-        .btn-signin:hover, .btn-signup:hover {
+        .btn-signin:hover,
+        .btn-signup:hover {
             background: #23d18b;
             color: #ffffff;
         }
@@ -602,17 +603,17 @@
             .hero-title {
                 font-size: 2.5rem;
             }
-            
+
             .hero-tagline {
                 font-size: 1.75rem;
             }
-            
+
             .footer-content {
                 flex-direction: column;
                 gap: 1.5rem;
                 align-items: flex-start;
             }
-            
+
             .footer-contact {
                 flex-direction: column;
                 gap: 1rem;
@@ -620,13 +621,13 @@
                 flex: 1;
                 width: 100%;
             }
-            
+
             .footeropyright {
                 margin-left: 0;
                 width: 100%;
                 text-align: left;
             }
-            
+
             .banner-text h3 {
                 font-size: 1.5rem;
                 padding: 1rem 2rem;
@@ -634,20 +635,24 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- Navigation Header -->
     <header class="header">
         <nav class="nav">
             <div class="logo-container" onclick="showLandingPage()" style="cursor: pointer;">
-                <img src="logo.png" alt="Twinnir Logo" class="logo-img" style="height: 40px; width: auto; max-width: 200px; object-fit: contain;">
+                <img src="logo.png" alt="Twinnir Logo" class="logo-img"
+                    style="height: 40px; width: auto; max-width: 200px; object-fit: contain;">
             </div>
             <div class="nav-buttons">
                 <!-- Dashboard button hidden -->
                 <!-- <button id="db-dashboard-btn-header" style="display: none; padding: 0.5rem 1.5rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-right: 0.5rem;" onclick="showDatabaseDashboard()" title="Dashboard">
                     📊 Dashboard
                 </button> -->
-                <button id="nav-logout-btn" class="btn-logout" style="display: none; padding: 0.6rem 1.5rem; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-right: 0.5rem;" onclick="handleLogout()">Logout</button>
+                <button id="nav-logout-btn" class="btn-logout"
+                    style="display: none; padding: 0.6rem 1.5rem; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-right: 0.5rem;"
+                    onclick="handleLogout()">Logout</button>
                 <button class="btn-signin" onclick="showLoginModal()">Sign In</button>
                 <button class="btn-signup" onclick="showSignUpModal()">Sign Up</button>
             </div>
@@ -671,10 +676,12 @@
     <!-- Main Content -->
     <section class="main-content">
         <p class="content-text">
-            Transform your physical assets, operations, and entire environments into dynamic digital replicas, unlocking unparalleled insights, efficiency, and innovation across every sector.
+            Transform your physical assets, operations, and entire environments into dynamic digital replicas, unlocking
+            unparalleled insights, efficiency, and innovation across every sector.
         </p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <button class="btn-explore" id="explore-btn" onclick="window.location.href='index.htm'">Explore Our Solutions</button>
+            <button class="btn-explore" id="explore-btn" onclick="window.location.href='map.html'">Explore Our
+                Solutions</button>
             <button class="btn-explore" onclick="showDemoModal()">Request a Demo</button>
         </div>
     </section>
@@ -692,17 +699,22 @@
     </section>
 
     <!-- Map Page (Hidden by default) -->
-    <div id="map-page" class="page" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: 999;">
+    <div id="map-page" class="page"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; z-index: 999;">
         <!-- Map Container -->
         <div id="map" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1;"></div>
-        
+
         <!-- Top Left Controls -->
-        <div id="top-left-controls" style="position: absolute; top: 15px; left: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 12px; max-width: 250px; pointer-events: auto;">
+        <div id="top-left-controls"
+            style="position: absolute; top: 15px; left: 15px; z-index: 1000; display: flex; flex-direction: column; gap: 12px; max-width: 250px; pointer-events: auto;">
             <!-- Logo removed -->
             <!-- Space Dropdown -->
-            <div style="background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-                <label for="space-dropdown" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #333;">Space</label>
-                <select id="space-dropdown" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; background: white;">
+            <div
+                style="background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                <label for="space-dropdown"
+                    style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #333;">Space</label>
+                <select id="space-dropdown"
+                    style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; background: white;">
                     <option value="">All Spaces</option>
                     <option value="space1">Space 1</option>
                     <option value="space2">Space 2</option>
@@ -710,21 +722,27 @@
                 </select>
             </div>
             <!-- Return to Home Button -->
-            <button onclick="showLandingPage()" style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; width: 100%;">
+            <button onclick="showLandingPage()"
+                style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; width: 100%;">
                 ← Return to Home
             </button>
             <!-- Virtual Tour Button -->
-            <button onclick="window.location.href='index.htm'" style="padding: 10px 20px; background: rgba(47, 152, 202, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; width: 100%;">
+            <button onclick="window.location.href='map.html'"
+                style="padding: 10px 20px; background: rgba(47, 152, 202, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; width: 100%;">
                 🏠 Virtual Tour
             </button>
         </div>
 
         <!-- Top Right Controls -->
-        <div id="top-right-controls" style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; max-width: 70%; pointer-events: auto;">
+        <div id="top-right-controls"
+            style="position: absolute; top: 15px; right: 15px; z-index: 1000; display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; max-width: 70%; pointer-events: auto;">
             <!-- Organization Dropdown -->
-            <div style="background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-                <label for="organization-dropdown" style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #333;">Organization</label>
-                <select id="organization-dropdown" style="width: 200px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; background: white;">
+            <div
+                style="background: rgba(255, 255, 255, 0.95); padding: 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                <label for="organization-dropdown"
+                    style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #333;">Organization</label>
+                <select id="organization-dropdown"
+                    style="width: 200px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; background: white;">
                     <option value="">All Organizations</option>
                     <option value="org1">Organization 1</option>
                     <option value="org2">Organization 2</option>
@@ -736,66 +754,96 @@
                 📊 Dashboard
             </button> -->
             <!-- Documents Button -->
-            <button id="documents-btn" style="width: 45px; height: 45px; background: #23d18b; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex-shrink: 0;" title="Documents">
+            <button id="documents-btn"
+                style="width: 45px; height: 45px; background: #23d18b; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); flex-shrink: 0;"
+                title="Documents">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                    <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
                 </svg>
             </button>
             <!-- Export Button -->
-            <button id="export-btn" style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; white-space: nowrap;" title="Export">
+            <button id="export-btn"
+                style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; white-space: nowrap;"
+                title="Export">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
-                    <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+                    <path
+                        d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
                 </svg>
                 Export
             </button>
             <!-- Logout Button -->
-            <button id="logout-btn" style="display: none; padding: 10px 20px; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;" onclick="handleLogout()">
+            <button id="logout-btn"
+                style="display: none; padding: 10px 20px; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;"
+                onclick="handleLogout()">
                 Logout
             </button>
         </div>
 
         <!-- Bottom Left Controls -->
-        <div id="bottom-left-controls" style="position: absolute; bottom: 20px; left: 20px; z-index: 1000; display: flex; gap: 10px; flex-wrap: wrap; pointer-events: auto;">
-            <button onclick="window.location.href='index.htm'" style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">360° VIEWS</button>
-            <button style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">DRONE FOOTAGE</button>
+        <div id="bottom-left-controls"
+            style="position: absolute; bottom: 20px; left: 20px; z-index: 1000; display: flex; gap: 10px; flex-wrap: wrap; pointer-events: auto;">
+            <button onclick="window.location.href='map.html'"
+                style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">360°
+                VIEWS</button>
+            <button
+                style="padding: 10px 20px; background: rgba(0,0,0,0.8); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap;">DRONE
+                FOOTAGE</button>
         </div>
 
         <!-- Bottom Right Controls -->
-        <div id="bottom-right-controls" style="position: absolute; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: auto;">
+        <div id="bottom-right-controls"
+            style="position: absolute; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: auto;">
             <!-- Top Row: Layers, Edit, Upload -->
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button id="layers-control-btn" style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="Layers">
+                <button id="layers-control-btn"
+                    style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                    title="Layers">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                        <rect x="3" y="3" width="7" height="7" fill="white"/>
-                        <rect x="14" y="3" width="7" height="7" fill="white"/>
-                        <rect x="3" y="14" width="7" height="7" fill="white"/>
-                        <rect x="14" y="14" width="7" height="7" fill="white"/>
+                        <rect x="3" y="3" width="7" height="7" fill="white" />
+                        <rect x="14" y="3" width="7" height="7" fill="white" />
+                        <rect x="3" y="14" width="7" height="7" fill="white" />
+                        <rect x="14" y="14" width="7" height="7" fill="white" />
                     </svg>
                 </button>
-                <button id="edit-control-btn" style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="Edit/Annotations">
+                <button id="edit-control-btn"
+                    style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                    title="Edit/Annotations">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="1">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                 </button>
-                <button id="upload-control-btn" style="display: none; width: 45px; height: 45px; background: #23d18b; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.3);" title="Upload Location" onclick="showUploadModal()">
+                <button id="upload-control-btn"
+                    style="display: none; width: 45px; height: 45px; background: #23d18b; border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"
+                    title="Upload Location" onclick="showUploadModal()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                        <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z"/>
+                        <path
+                            d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
                     </svg>
                 </button>
             </div>
             <!-- Zoom Controls -->
             <div style="display: flex; flex-direction: column; gap: 5px;">
-                <button id="zoom-in-btn" style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; flex-shrink: 0;" onclick="if(window.map) window.map.zoomIn()" title="Zoom In">+</button>
-                <button id="zoom-out-btn" style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; flex-shrink: 0;" onclick="if(window.map) window.map.zoomOut()" title="Zoom Out">−</button>
+                <button id="zoom-in-btn"
+                    style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; flex-shrink: 0;"
+                    onclick="if(window.map) window.map.zoomIn()" title="Zoom In">+</button>
+                <button id="zoom-out-btn"
+                    style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; flex-shrink: 0;"
+                    onclick="if(window.map) window.map.zoomOut()" title="Zoom Out">−</button>
             </div>
             <!-- Bottom Row: 3DGS, 360°, Share -->
             <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
-                <button style="padding: 8px 16px; background: rgba(0,0,0,0.75); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">3DGS</button>
-                <button style="padding: 8px 16px; background: rgba(0,0,0,0.75); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">360°</button>
-                <button style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="Share">
+                <button
+                    style="padding: 8px 16px; background: rgba(0,0,0,0.75); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">3DGS</button>
+                <button
+                    style="padding: 8px 16px; background: rgba(0,0,0,0.75); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; white-space: nowrap;">360°</button>
+                <button
+                    style="width: 45px; height: 45px; background: rgba(0,0,0,0.75); border: none; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"
+                    title="Share">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
-                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        <path
+                            d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" />
                     </svg>
                 </button>
             </div>
@@ -812,38 +860,42 @@
                     <label for="location-name">Location Name *</label>
                     <input type="text" id="location-name" required placeholder="Enter location name">
                 </div>
-                
+
                 <div class="form-group">
                     <label for="location-description">Description</label>
                     <textarea id="location-description" rows="3" placeholder="Enter description"></textarea>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="location-organization">Organization (Optional)</label>
                     <select id="location-organization">
                         <option value="">Select Organization</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="location-property">Property (Optional)</label>
                     <select id="location-property">
                         <option value="">Select Property</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="location-space">Space (Optional)</label>
                     <select id="location-space">
                         <option value="">Select Space</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Media Upload (Optional)</label>
-                    <input type="file" id="location-file" accept="image/*,video/*" style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;" onchange="handleFileSelectForCoordinates(event)" data-max-size="1073741824">
+                    <input type="file" id="location-file" accept="image/*,video/*"
+                        style="width: 100%; padding: 0.5rem; margin-bottom: 0.5rem;"
+                        onchange="handleFileSelectForCoordinates(event)" data-max-size="1073741824">
                     <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #ddd;">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #666; font-size: 0.9rem;">Or provide a direct link:</label>
+                        <label
+                            style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #666; font-size: 0.9rem;">Or
+                            provide a direct link:</label>
                         <input type="url" id="location-url" placeholder="https://example.com/media/video.mp4">
                     </div>
                     <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.5rem;">
@@ -852,98 +904,137 @@
                         📍 GPS coordinates will be automatically extracted from images if available
                     </small>
                 </div>
-                
+
                 <div class="form-group">
                     <label>Coordinates *</label>
                     <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)" style="flex: 1;" onchange="showLocationOnMapLanding()" oninput="showLocationOnMapLanding()">
-                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)" style="flex: 1;" onchange="showLocationOnMapLanding()" oninput="showLocationOnMapLanding()">
+                        <input type="text" id="location-lat" required placeholder="Latitude (-35 to -22)"
+                            style="flex: 1;" onchange="showLocationOnMapLanding()" oninput="showLocationOnMapLanding()">
+                        <input type="text" id="location-lng" required placeholder="Longitude (16 to 33)"
+                            style="flex: 1;" onchange="showLocationOnMapLanding()" oninput="showLocationOnMapLanding()">
                     </div>
-                    <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Enter decimal degrees (e.g., -26.106) or DMS format (e.g., 26;6;22.889). Location will be shown on map automatically.</small>
+                    <small style="color: #666; font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">Enter decimal
+                        degrees (e.g., -26.106) or DMS format (e.g., 26;6;22.889). Location will be shown on map
+                        automatically.</small>
                 </div>
-                
+
                 <button type="submit" class="btn-submit">Upload Location</button>
             </form>
         </div>
     </div>
 
     <!-- Database Dashboard Modal - Hidden/Disabled -->
-    <div id="db-dashboard" class="modal hidden" style="display: none !important; visibility: hidden; position: fixed; z-index: -1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); overflow-y: auto;">
-        <div class="modal-content" style="max-width: 95%; max-height: 95vh; margin: 1rem auto; background: white; border-radius: 8px; padding: 0; position: relative;">
-            <span class="close" onclick="closeDatabaseDashboard()" style="position: absolute; top: 15px; right: 20px; font-size: 32px; font-weight: bold; color: #666; cursor: pointer; z-index: 1001; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">&times;</span>
-            
+    <div id="db-dashboard" class="modal hidden"
+        style="display: none !important; visibility: hidden; position: fixed; z-index: -1; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); overflow-y: auto;">
+        <div class="modal-content"
+            style="max-width: 95%; max-height: 95vh; margin: 1rem auto; background: white; border-radius: 8px; padding: 0; position: relative;">
+            <span class="close" onclick="closeDatabaseDashboard()"
+                style="position: absolute; top: 15px; right: 20px; font-size: 32px; font-weight: bold; color: #666; cursor: pointer; z-index: 1001; background: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">&times;</span>
+
             <div style="padding: 2rem; border-bottom: 2px solid #eee;">
                 <h2 style="margin: 0; color: #333; font-size: 1.8rem;">Dashboard</h2>
                 <p style="margin: 0.5rem 0 0 0; color: #666;">Manage Organizations, Spaces, Assets, and more</p>
             </div>
-            
+
             <!-- Tabs -->
             <div style="display: flex; border-bottom: 2px solid #eee; background: #f8f9fa; overflow-x: auto;">
-                <button class="db-tab active" onclick="switchDbTab('organizations')" data-tab="organizations" style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">🏢 Organizations</button>
-                <button class="db-tab" onclick="switchDbTab('properties')" data-tab="properties" style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">🏘️ Properties</button>
-                <button class="db-tab" onclick="switchDbTab('spaces')" data-tab="spaces" style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📍 Spaces</button>
-                <button class="db-tab" onclick="switchDbTab('assets')" data-tab="assets" style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">🔧 Assets</button>
-                <button class="db-tab" onclick="switchDbTab('space_types')" data-tab="space_types" style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📋 Space Types</button>
-                <button class="db-tab" onclick="switchDbTab('asset_types')" data-tab="asset_types" style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📋 Asset Types</button>
-                <button class="db-tab" onclick="switchDbTab('media')" data-tab="media" style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📸 Media by Location</button>
+                <button class="db-tab active" onclick="switchDbTab('organizations')" data-tab="organizations"
+                    style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">🏢
+                    Organizations</button>
+                <button class="db-tab" onclick="switchDbTab('properties')" data-tab="properties"
+                    style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">🏘️
+                    Properties</button>
+                <button class="db-tab" onclick="switchDbTab('spaces')" data-tab="spaces"
+                    style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📍
+                    Spaces</button>
+                <button class="db-tab" onclick="switchDbTab('assets')" data-tab="assets"
+                    style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">🔧
+                    Assets</button>
+                <button class="db-tab" onclick="switchDbTab('space_types')" data-tab="space_types"
+                    style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📋
+                    Space Types</button>
+                <button class="db-tab" onclick="switchDbTab('asset_types')" data-tab="asset_types"
+                    style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📋
+                    Asset Types</button>
+                <button class="db-tab" onclick="switchDbTab('media')" data-tab="media"
+                    style="padding: 1rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: all 0.3s;">📸
+                    Media by Location</button>
             </div>
-            
+
             <!-- Tab Content -->
             <div style="padding: 2rem; max-height: calc(95vh - 200px); overflow-y: auto;">
                 <!-- Organizations Tab -->
                 <div id="db-tab-organizations" class="db-tab-content active">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0;">Organizations</h3>
-                        <button onclick="showAddForm('organization')" style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ Add Organization</button>
+                        <button onclick="showAddForm('organization')"
+                            style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                            Add Organization</button>
                     </div>
                     <div id="organizations-list" class="db-list"></div>
                 </div>
-                
+
                 <!-- Properties Tab -->
                 <div id="db-tab-properties" class="db-tab-content" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0;">Properties</h3>
-                        <button onclick="showAddForm('property')" style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ Add Property</button>
+                        <button onclick="showAddForm('property')"
+                            style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                            Add Property</button>
                     </div>
                     <div id="properties-list" class="db-list"></div>
                 </div>
-                
+
                 <!-- Spaces Tab -->
                 <div id="db-tab-spaces" class="db-tab-content" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0;">Spaces</h3>
-                        <button onclick="showAddForm('space')" style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ Add Space</button>
+                        <button onclick="showAddForm('space')"
+                            style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                            Add Space</button>
                     </div>
                     <div id="spaces-list" class="db-list"></div>
                 </div>
-                
+
                 <!-- Assets Tab -->
                 <div id="db-tab-assets" class="db-tab-content" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0;">Assets</h3>
-                        <button onclick="showAddForm('asset')" style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ Add Asset</button>
+                        <button onclick="showAddForm('asset')"
+                            style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                            Add Asset</button>
                     </div>
                     <div id="assets-list" class="db-list"></div>
                 </div>
-                
+
                 <!-- Space Types Tab -->
                 <div id="db-tab-space_types" class="db-tab-content" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0;">Space Types</h3>
-                        <button onclick="showAddForm('space_type')" style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ Add Space Type</button>
+                        <button onclick="showAddForm('space_type')"
+                            style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                            Add Space Type</button>
                     </div>
                     <div id="space_types-list" class="db-list"></div>
                 </div>
-                
+
                 <!-- Asset Types Tab -->
                 <div id="db-tab-asset_types" class="db-tab-content" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h3 style="margin: 0;">Asset Types</h3>
-                        <button onclick="showAddForm('asset_type')" style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+ Add Asset Type</button>
+                        <button onclick="showAddForm('asset_type')"
+                            style="padding: 0.6rem 1.2rem; background: #23d18b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                            Add Asset Type</button>
                     </div>
                     <div id="asset_types-list" class="db-list"></div>
                 </div>
-                
+
                 <!-- Media by Location Tab -->
                 <div id="db-tab-media" class="db-tab-content" style="display: none;">
                     <h3 style="margin: 0 0 1.5rem 0;">Media Grouped by Location</h3>
@@ -954,9 +1045,12 @@
     </div>
 
     <!-- Add/Edit Form Modal -->
-    <div id="db-form-modal" class="modal hidden" style="display: none; position: fixed; z-index: 21000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); overflow-y: auto;">
-        <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; position: relative;">
-            <span class="close" onclick="closeDbFormModal()" style="position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; color: #666; cursor: pointer; z-index: 1001;">&times;</span>
+    <div id="db-form-modal" class="modal hidden"
+        style="display: none; position: fixed; z-index: 21000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); overflow-y: auto;">
+        <div class="modal-content"
+            style="max-width: 600px; max-height: 90vh; overflow-y: auto; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px; position: relative;">
+            <span class="close" onclick="closeDbFormModal()"
+                style="position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; color: #666; cursor: pointer; z-index: 1001;">&times;</span>
             <h2 id="db-form-title" style="margin-top: 0;"></h2>
             <form id="db-form" onsubmit="handleDbFormSubmit(event)"></form>
         </div>
@@ -967,20 +1061,26 @@
         <div class="footer-content">
             <div class="footer-contact">
                 <span class="footer-contact-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                        style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                        <path
+                            d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
                     </svg>
                     <span>(+27) 11 656 3356</span>
                 </span>
                 <span class="footer-contact-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                        style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                        <path
+                            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
                     </svg>
                     <span>info@twinnir.com</span>
                 </span>
                 <span class="footer-contact-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"
+                        style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+                        <path
+                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                     </svg>
                     <span>Johannesburg, South Africa</span>
                 </span>
@@ -1012,7 +1112,8 @@
         <div class="modal-content">
             <span class="close" onclick="closeLoginModal()">&times;</span>
             <h2>Sign In</h2>
-            <p style="margin-bottom: 1.5rem; color: #666; font-size: 0.9rem;">Sign in to access the platform or create a new account.</p>
+            <p style="margin-bottom: 1.5rem; color: #666; font-size: 0.9rem;">Sign in to access the platform or create a
+                new account.</p>
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="loginEmail">Email</label>
@@ -1025,7 +1126,8 @@
                 <button type="submit" class="btn-submit">Sign In</button>
             </form>
             <p style="margin-top: 1rem; font-size: 0.85rem; color: #666; text-align: center;">
-                Don't have an account? <a href="#" onclick="closeLoginModal(); showSignUpModal();" style="color: #23d18b; text-decoration: underline; cursor: pointer;">Sign Up</a>
+                Don't have an account? <a href="#" onclick="closeLoginModal(); showSignUpModal();"
+                    style="color: #23d18b; text-decoration: underline; cursor: pointer;">Sign Up</a>
             </p>
         </div>
     </div>
@@ -1052,7 +1154,8 @@
                 <button type="submit" class="btn-submit">Sign Up</button>
             </form>
             <p style="margin-top: 1rem; font-size: 0.85rem; color: #666; text-align: center;">
-                Already have an account? <a href="#" onclick="closeSignUpModal(); showLoginModal();" style="color: #23d18b; text-decoration: underline; cursor: pointer;">Sign In</a>
+                Already have an account? <a href="#" onclick="closeSignUpModal(); showLoginModal();"
+                    style="color: #23d18b; text-decoration: underline; cursor: pointer;">Sign In</a>
             </p>
         </div>
     </div>
@@ -1077,13 +1180,13 @@
             const mainContent = document.querySelector('.main-content');
             const bottomBanner = document.querySelector('.bottom-banner');
             const footer = document.querySelector('.footer');
-            
+
             if (header) header.style.display = 'none';
             if (hero) hero.style.display = 'none';
             if (mainContent) mainContent.style.display = 'none';
             if (bottomBanner) bottomBanner.style.display = 'none';
             if (footer) footer.style.display = 'none';
-            
+
             // Show map page
             const mapPage = document.getElementById('map-page');
             if (mapPage) {
@@ -1091,7 +1194,7 @@
                 document.querySelector('body').style.overflow = 'hidden';
                 document.querySelector('body').style.margin = '0';
                 document.querySelector('body').style.padding = '0';
-                
+
                 // Initialize map if not already done
                 setTimeout(() => {
                     if (typeof initializeMap === 'function' && !window.mapInitialized) {
@@ -1113,20 +1216,20 @@
             if (mapPage) {
                 mapPage.style.display = 'none';
             }
-            
+
             // Show header and landing page sections
             const header = document.querySelector('.header');
             const hero = document.querySelector('.hero');
             const mainContent = document.querySelector('.main-content');
             const bottomBanner = document.querySelector('.bottom-banner');
             const footer = document.querySelector('.footer');
-            
+
             if (header) header.style.display = 'block';
             if (hero) hero.style.display = 'block';
             if (mainContent) mainContent.style.display = 'block';
             if (bottomBanner) bottomBanner.style.display = 'block';
             if (footer) footer.style.display = 'block';
-            
+
             document.querySelector('body').style.overflow = 'auto';
         }
 
@@ -1145,7 +1248,7 @@
                 await populateUploadDropdowns();
             }
         }
-        
+
         async function populateUploadDropdowns() {
             // Populate organizations
             const orgSelect = document.getElementById('location-organization');
@@ -1158,7 +1261,7 @@
                     });
                 }
             }
-            
+
             // Populate properties
             const propSelect = document.getElementById('location-property');
             if (propSelect) {
@@ -1170,7 +1273,7 @@
                     });
                 }
             }
-            
+
             // Populate spaces
             const spaceSelect = document.getElementById('location-space');
             if (spaceSelect) {
@@ -1183,39 +1286,39 @@
                 }
             }
         }
-        
+
         // Make function globally accessible
         window.populateUploadFormDropdowns = populateUploadDropdowns;
-        
+
         // Handle file selection for automatic coordinate extraction
         function handleFileSelectForCoordinates(event) {
             const file = event.target.files[0];
             if (!file || !file.type.startsWith('image/')) {
                 return;
             }
-            
+
             // Extract GPS coordinates from image immediately when file is selected
             if (typeof EXIF !== 'undefined') {
-                EXIF.getData(file, function() {
+                EXIF.getData(file, function () {
                     const gpsLat = EXIF.getTag(this, 'GPSLatitude');
                     const gpsLatRef = EXIF.getTag(this, 'GPSLatitudeRef');
                     const gpsLng = EXIF.getTag(this, 'GPSLongitude');
                     const gpsLngRef = EXIF.getTag(this, 'GPSLongitudeRef');
-                    
+
                     if (gpsLat && Array.isArray(gpsLat) && gpsLng && Array.isArray(gpsLng)) {
                         // Convert to decimal degrees
-                        let latDecimal = gpsLat[0] + (gpsLat[1] || 0)/60 + (gpsLat[2] || 0)/3600;
-                        let lngDecimal = gpsLng[0] + (gpsLng[1] || 0)/60 + (gpsLng[2] || 0)/3600;
-                        
+                        let latDecimal = gpsLat[0] + (gpsLat[1] || 0) / 60 + (gpsLat[2] || 0) / 3600;
+                        let lngDecimal = gpsLng[0] + (gpsLng[1] || 0) / 60 + (gpsLng[2] || 0) / 3600;
+
                         // Apply reference (N/S, E/W)
                         if (gpsLatRef === 'S') latDecimal = -latDecimal;
                         if (gpsLngRef === 'W') lngDecimal = -lngDecimal;
-                        
+
                         // Validate South Africa bounds
                         if (latDecimal >= -35 && latDecimal <= -22 && lngDecimal >= 16 && lngDecimal <= 33) {
                             document.getElementById('location-lat').value = latDecimal.toFixed(6);
                             document.getElementById('location-lng').value = lngDecimal.toFixed(6);
-                            
+
                             // Show location on map if available
                             const currentMap = map || window.map;
                             if (currentMap && typeof currentMap.setView === 'function') {
@@ -1225,7 +1328,7 @@
                                     .bindPopup('GPS extracted from image')
                                     .openPopup();
                             }
-                            
+
                             alert('✅ GPS coordinates extracted from image!\n\nLatitude: ' + latDecimal.toFixed(6) + '\nLongitude: ' + lngDecimal.toFixed(6) + '\n\nLocation shown on map. You can now fill in other details and upload.');
                         } else {
                             alert('⚠️ GPS coordinates found in image but are outside South Africa bounds.\n\nCoordinates: ' + latDecimal.toFixed(6) + ', ' + lngDecimal.toFixed(6) + '\n\nPlease verify or enter coordinates manually.');
@@ -1241,7 +1344,7 @@
                 console.warn('EXIF.js library not loaded');
             }
         }
-        
+
         // Make function globally accessible
         window.handleFileSelectForCoordinates = handleFileSelectForCoordinates;
 
@@ -1258,9 +1361,9 @@
         function showLocationOnMapLanding() {
             const latInput = document.getElementById('location-lat');
             const lngInput = document.getElementById('location-lng');
-            
+
             if (!latInput || !lngInput) return;
-            
+
             function parseCoordinate(value) {
                 if (!value) return null;
                 if (value.includes(';')) {
@@ -1272,22 +1375,22 @@
                 const num = parseFloat(value);
                 return isNaN(num) ? null : num;
             }
-            
+
             const lat = parseCoordinate(latInput.value);
             const lng = parseCoordinate(lngInput.value);
-            
+
             if (lat && lng) {
                 // Validate South Africa bounds
                 if (lat >= -35 && lat <= -22 && lng >= 16 && lng <= 33) {
                     const currentMap = map || window.map;
                     if (currentMap && typeof currentMap.setView === 'function') {
                         currentMap.setView([lat, lng], 15);
-                        
+
                         // Remove existing preview marker if any
                         if (window.previewMarker) {
                             currentMap.removeLayer(window.previewMarker);
                         }
-                        
+
                         // Add preview marker
                         const previewMarker = L.marker([lat, lng], {
                             icon: L.icon({
@@ -1299,23 +1402,23 @@
                                 shadowSize: [41, 41]
                             })
                         })
-                        .addTo(currentMap)
-                        .bindPopup('Location to upload')
-                        .openPopup();
-                        
+                            .addTo(currentMap)
+                            .bindPopup('Location to upload')
+                            .openPopup();
+
                         window.previewMarker = previewMarker;
                     }
                 }
             }
         }
-        
+
         // Make function globally accessible
         window.showLocationOnMapLanding = showLocationOnMapLanding;
 
         // Handle Location Upload
         async function handleLocationUpload(event) {
             event.preventDefault();
-            
+
             if (!window.isAuthenticated) {
                 alert('Please sign in to upload locations');
                 showLoginModal();
@@ -1328,7 +1431,7 @@
             const lng = parseCoordinate(document.getElementById('location-lng').value);
             const file = document.getElementById('location-file').files[0];
             const url = document.getElementById('location-url').value;
-            
+
             // Check file size (1GB = 1073741824 bytes)
             if (file && file.size > 1073741824) {
                 alert('File size exceeds 1GB limit. Please use a direct link for files larger than 1GB.');
@@ -1437,7 +1540,7 @@
 
                 alert('Location uploaded successfully!');
                 closeUploadModal();
-                
+
                 // Remove preview marker if exists
                 if (window.previewMarker) {
                     const currentMap = map || window.map;
@@ -1446,13 +1549,13 @@
                     }
                     window.previewMarker = null;
                 }
-                
+
                 // Show location on map with blue pin and image preview
                 if (lat && lng) {
                     const currentMap = map || window.map;
                     if (currentMap && typeof currentMap.setView === 'function') {
                         currentMap.setView([lat, lng], 15);
-                        
+
                         // Create blue icon
                         const blueIcon = L.icon({
                             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
@@ -1462,15 +1565,15 @@
                             popupAnchor: [1, -34],
                             shadowSize: [41, 41]
                         });
-                        
+
                         // Build popup content with image preview
                         let popupContent = `<div style="min-width: 250px; max-width: 400px;">
                             <b style="font-size: 1.1rem; color: #333;">${name}</b><br>`;
-                        
+
                         if (description) {
                             popupContent += `<p style="margin: 0.5rem 0; color: #666;">${description}</p>`;
                         }
-                        
+
                         if (fileUrl) {
                             if (mediaType === 'image') {
                                 popupContent += `<img src="${fileUrl}" style="width: 100%; max-height: 300px; object-fit: cover; border-radius: 4px; margin-top: 0.5rem; cursor: pointer;" onclick="window.open('${fileUrl}', '_blank')" title="Click to view full size">`;
@@ -1480,16 +1583,16 @@
                                 popupContent += `<a href="${fileUrl}" target="_blank" style="color: #23d18b; text-decoration: underline; display: block; margin-top: 0.5rem;">View Media</a>`;
                             }
                         }
-                        
+
                         popupContent += `</div>`;
-                        
+
                         const marker = L.marker([lat, lng], { icon: blueIcon })
                             .addTo(currentMap)
                             .bindPopup(popupContent)
                             .openPopup();
                     }
                 }
-                
+
                 // Reload map locations
                 if (typeof loadMapLocations === 'function') {
                     setTimeout(() => {
@@ -1533,7 +1636,7 @@
             // const dbDashboardBtnHeader = document.getElementById('db-dashboard-btn-header');
             const signInBtn = document.querySelector('.btn-signin');
             const signUpBtn = document.querySelector('.btn-signup');
-            
+
             if (uploadBtn) {
                 uploadBtn.style.display = window.isAuthenticated ? 'flex' : 'none';
             }
@@ -1578,34 +1681,34 @@
                     alert('Error logging out: ' + error.message);
                     return;
                 }
-                
+
                 // Clear authentication state
                 window.isAuthenticated = false;
-                
+
                 // Update UI immediately
                 updateUIForAuth(null);
-                
+
                 // Also update via authManager if available
                 if (window.authManager && typeof window.authManager.updateUIForLoggedOutUser === 'function') {
                     window.authManager.updateUIForLoggedOutUser();
                 }
-                
+
                 console.log('✅ Logged out successfully');
-                
+
                 // Show success message
                 alert('Logged out successfully');
-                
+
                 // Optionally redirect to landing page if on a different page
                 if (window.location.pathname.includes('index.htm')) {
                     window.location.href = 'landing.html';
                 }
-                
+
             } catch (error) {
                 console.error('❌ Logout error:', error);
                 alert('Error logging out: ' + (error.message || 'Unknown error'));
             }
         }
-        
+
         // Make handleLogout globally accessible
         window.handleLogout = handleLogout;
 
@@ -1619,7 +1722,7 @@
         });
 
         // Demo Modal Functions - Make globally accessible
-        window.showDemoModal = function() {
+        window.showDemoModal = function () {
             const modal = document.getElementById('demoModal');
             if (modal) {
                 modal.classList.remove('hidden');
@@ -1627,7 +1730,7 @@
             }
         };
 
-        window.closeDemoModal = function() {
+        window.closeDemoModal = function () {
             const modal = document.getElementById('demoModal');
             if (modal) {
                 modal.classList.add('hidden');
@@ -1647,7 +1750,7 @@
         }
 
         // Login Modal Functions - Make globally accessible
-        window.showLoginModal = function() {
+        window.showLoginModal = function () {
             const modal = document.getElementById('loginModal');
             if (modal) {
                 modal.classList.remove('hidden');
@@ -1657,7 +1760,7 @@
             }
         };
 
-        window.closeLoginModal = function() {
+        window.closeLoginModal = function () {
             const modal = document.getElementById('loginModal');
             if (modal) {
                 modal.classList.add('hidden');
@@ -1686,7 +1789,7 @@
                 window.isAuthenticated = true;
                 // Force immediate UI update
                 updateUIForAuth(data.session);
-                
+
                 // Double check buttons are hidden
                 setTimeout(() => {
                     const signInBtn = document.querySelector('.btn-signin');
@@ -1695,7 +1798,7 @@
                     if (signUpBtn) signUpBtn.classList.add('hidden');
                     updateUIForAuth(data.session);
                 }, 100);
-                
+
                 closeLoginModal();
                 alert('Login successful!');
             } catch (error) {
@@ -1706,7 +1809,7 @@
 
         // Sign Up Modal Functions
         // Sign Up Modal Functions - Make globally accessible
-        window.showSignUpModal = function() {
+        window.showSignUpModal = function () {
             const modal = document.getElementById('signUpModal');
             if (modal) {
                 modal.classList.remove('hidden');
@@ -1716,7 +1819,7 @@
             }
         };
 
-        window.closeSignUpModal = function() {
+        window.closeSignUpModal = function () {
             const modal = document.getElementById('signUpModal');
             if (modal) {
                 modal.classList.add('hidden');
@@ -1790,12 +1893,12 @@
         }
 
         // Close modals when clicking outside
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const demoModal = document.getElementById('demoModal');
             const loginModal = document.getElementById('loginModal');
             const signUpModal = document.getElementById('signUpModal');
             const uploadModal = document.getElementById('uploadModal');
-            
+
             if (event.target === demoModal) {
                 closeDemoModal();
             }
@@ -1829,4 +1932,5 @@
     </script>
 
 </body>
+
 </html>
