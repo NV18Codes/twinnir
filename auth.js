@@ -143,6 +143,7 @@ class AuthManager {
                 email: email,
                 password: password,
                 options: {
+                    emailRedirectTo: 'https://twinnir-dev.netlify.app/landing.html',
                     data: {
                         name: name,
                         organization: organization
@@ -236,7 +237,7 @@ class AuthManager {
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/landing.html?reset=true`
+                redirectTo: 'https://twinnir-dev.netlify.app/landing.html?reset=true'
             });
 
             if (error) {

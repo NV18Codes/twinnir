@@ -19,94 +19,151 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Inter', Arial, Helvetica, sans-serif;
         }
 
         #map {
             position: fixed;
-            top: 0;
+            top: 70px;
             left: 0;
             right: 0;
             bottom: 0;
             z-index: 1;
         }
         
-        /* Top Left Controls - Dropdowns */
-        .top-left-controls {
+        /* Gradient Navbar */
+        .navbar {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #0a1e2e 0%, #000000 50%, #000000 100%);
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(35, 209, 139, 0.1);
+        }
+        
+        /* Logo */
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 10px rgba(35, 209, 139, 0.5));
+        }
+        
+        .navbar-logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        /* Dropdowns */
+        .navbar-center {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+            max-width: 500px;
         }
         
         .filter-dropdown {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(0, 0, 0, 0.85);
+            padding: 10px 16px;
+            border: 2px solid rgba(35, 209, 139, 0.3);
+            border-radius: 8px;
+            background: rgba(10, 30, 46, 0.8);
             color: white;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            min-width: 160px;
+            min-width: 180px;
+            transition: all 0.2s ease;
+        }
+        
+        .filter-dropdown:hover {
+            border-color: #23d18b;
+            background: rgba(10, 30, 46, 0.95);
+            box-shadow: 0 0 15px rgba(35, 209, 139, 0.2);
         }
         
         .filter-dropdown:focus {
             outline: none;
-            box-shadow: 0 0 0 2px #23d18b;
+            border-color: #23d18b;
+            box-shadow: 0 0 0 3px rgba(35, 209, 139, 0.3);
         }
         
         .filter-dropdown:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
+            border-color: rgba(35, 209, 139, 0.1);
         }
         
-        /* Top Right Controls */
-        .top-right-controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
+        .filter-dropdown:disabled:hover {
+            background: rgba(10, 30, 46, 0.8);
+            box-shadow: none;
+        }
+        
+        /* Buttons */
+        .navbar-buttons {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
+            gap: 10px;
+            align-items: center;
         }
         
-        .control-btn-small {
-            padding: 8px 14px;
+        .nav-btn {
+            padding: 10px 18px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.8rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-size: 0.85rem;
             transition: all 0.2s ease;
+            white-space: nowrap;
         }
         
-        .control-btn-small:hover {
-            transform: translateY(-1px);
-        }
-        
-        .btn-home {
-            background: rgba(0,0,0,0.8);
-            color: white;
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(35, 209, 139, 0.4);
         }
         
         .btn-tour {
-            background: rgba(47, 152, 202, 0.9);
+            background: linear-gradient(135deg, #2F98CA 0%, #23d18b 100%);
+            border: 2px solid transparent;
             color: white;
+        }
+        
+        .btn-tour:hover {
+            background: linear-gradient(135deg, #23d18b 0%, #2F98CA 100%);
         }
         
         .btn-upload {
             background: #23d18b;
+            border: 2px solid #23d18b;
             color: white;
+        }
+        
+        .btn-upload:hover {
+            background: #1fbc7d;
+            box-shadow: 0 6px 25px rgba(35, 209, 139, 0.5);
         }
         
         .btn-logout {
             background: rgba(220, 53, 69, 0.9);
+            border: 2px solid rgba(220, 53, 69, 0.5);
             color: white;
+        }
+        
+        .btn-logout:hover {
+            background: #dc3545;
+            border-color: #dc3545;
         }
         
         /* Bottom Left - Zoom Controls */
@@ -114,29 +171,33 @@
             position: fixed;
             bottom: 30px;
             left: 20px;
-            z-index: 1000;
+            z-index: 1500;
             display: flex;
             flex-direction: column;
             gap: 5px;
         }
         
         .zoom-btn {
-            width: 36px;
-            height: 36px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(0,0,0,0.85);
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(35, 209, 139, 0.3);
+            border-radius: 8px;
+            background: rgba(10, 30, 46, 0.9);
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s ease;
         }
         
         .zoom-btn:hover {
-            background: rgba(47, 152, 202, 0.9);
+            background: #23d18b;
+            border-color: #23d18b;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(35, 209, 139, 0.5);
         }
         
         /* Bottom Right - Action Buttons */
@@ -144,42 +205,50 @@
             position: fixed;
             bottom: 30px;
             right: 20px;
-            z-index: 1000;
+            z-index: 1500;
             display: flex;
             gap: 10px;
         }
         
         .action-btn {
-            padding: 12px 18px;
-            border: none;
-            border-radius: 6px;
-            background: rgba(0,0,0,0.85);
+            padding: 12px 20px;
+            border: 2px solid rgba(35, 209, 139, 0.3);
+            border-radius: 8px;
+            background: rgba(10, 30, 46, 0.95);
             color: white;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
         
         .action-btn:hover {
-            background: rgba(47, 152, 202, 0.9);
+            background: #23d18b;
+            border-color: #23d18b;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(35, 209, 139, 0.5);
         }
         
         .action-btn.active {
             background: #23d18b;
+            border-color: #23d18b;
+            box-shadow: 0 0 20px rgba(35, 209, 139, 0.4);
         }
         
         /* Annotations Panel */
         #annotations-panel {
             position: fixed;
-            top: 100px;
+            top: 90px;
             right: 20px;
             width: 260px;
-            background: rgba(0,0,0,0.9);
+            background: rgba(10, 30, 46, 0.95);
+            border: 2px solid rgba(35, 209, 139, 0.3);
             border-radius: 8px;
             padding: 20px;
-            z-index: 1000;
+            z-index: 1500;
             display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
         }
         
         #annotations-panel.visible {
@@ -201,16 +270,25 @@
         
         .draw-tool {
             padding: 8px 12px;
-            background: rgba(47, 152, 202, 0.2);
-            border: 1px solid rgba(47, 152, 202, 0.5);
+            background: rgba(35, 209, 139, 0.15);
+            border: 1px solid rgba(35, 209, 139, 0.4);
             border-radius: 4px;
             color: white;
             cursor: pointer;
             font-size: 0.85rem;
+            transition: all 0.2s ease;
         }
         
         .draw-tool:hover {
-            background: rgba(47, 152, 202, 0.4);
+            background: rgba(35, 209, 139, 0.3);
+            border-color: #23d18b;
+            box-shadow: 0 0 10px rgba(35, 209, 139, 0.3);
+        }
+        
+        .draw-tool.active {
+            background: rgba(35, 209, 139, 0.5);
+            border-color: #23d18b;
+            box-shadow: 0 0 15px rgba(35, 209, 139, 0.4);
         }
         
         .color-palette {
@@ -237,7 +315,7 @@
         .modal {
             display: none;
             position: fixed;
-            z-index: 2000;
+            z-index: 2500;
             left: 0;
             top: 0;
             width: 100%;
@@ -358,12 +436,45 @@
             color: #23d18b;
         }
         
-        #image-fields, #video-fields {
+        #image-fields, #video-fields, #panorama-fields {
             display: none;
         }
         
-        #image-fields.active, #video-fields.active {
+        #image-fields.active, #video-fields.active, #panorama-fields.active {
             display: block;
+        }
+        
+        .dropdown-with-input select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: white;
+            color: black;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+        
+        .dropdown-with-input input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #2F98CA;
+            background: white;
+            color: black;
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+        
+        .modal-content input[type="text"],
+        .modal-content input[type="url"] {
+            background: white !important;
+            color: black !important;
+        }
+        
+        .modal-content small a {
+            color: #2F98CA;
+            text-decoration: underline;
         }
         
         /* Video Fullscreen Modal */
@@ -471,45 +582,103 @@
             font-size: 1rem;
             z-index: 4001;
         }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .navbar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 15px;
+            }
+            
+            .navbar-logo img {
+                height: 28px;
+            }
+            
+            .navbar-center {
+                order: 3;
+                width: 100%;
+                margin-top: 10px;
+                justify-content: flex-start;
+                gap: 10px;
+            }
+            
+            .filter-dropdown {
+                min-width: 140px;
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+            
+            .navbar-buttons {
+                gap: 8px;
+            }
+            
+            .nav-btn {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+            
+            #map {
+                top: 130px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .filter-dropdown {
+                min-width: 120px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
-        <!-- Map Container -->
+    <!-- Black Navbar -->
+    <nav class="navbar">
+        <!-- Logo -->
+        <div class="navbar-logo" onclick="window.location.href='landing.html'" style="cursor: pointer;">
+            <img src="TWINNIR LOGO GRADIENT_white letters-only (1).png" alt="Twinnir Logo">
+        </div>
+        
+        <!-- Dropdowns -->
+        <div class="navbar-center">
+            <select class="filter-dropdown" id="organization-dropdown" onchange="filterByOrganization(this.value)">
+                <option value="">🏢 Select Organization</option>
+            </select>
+            <select class="filter-dropdown" id="space-dropdown" onchange="filterBySpace(this.value)" disabled>
+                <option value="">📍 Select Space</option>
+            </select>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="navbar-buttons">
+            <button class="nav-btn btn-tour" onclick="window.open('https://drive.google.com/drive/folders/145UnvvoadbqJjg7VjREnkoo-QOGF9gUg', '_blank')">🔄 3DGS</button>
+            <button class="nav-btn btn-upload" id="btn-upload-location" onclick="showUploadModal()">📍 Upload</button>
+            <button class="nav-btn btn-logout" id="btn-logout" style="display:none;" onclick="handleLogout()">Logout</button>
+        </div>
+    </nav>
+    
+    <!-- Map Container -->
     <div id="map"></div>
-    
-    <!-- Top Left Controls - Organization/Space Dropdowns -->
-    <div class="top-left-controls">
-        <select class="filter-dropdown" id="organization-dropdown" onchange="filterByOrganization(this.value)">
-            <option value="">Select Organization</option>
-        </select>
-        <select class="filter-dropdown" id="space-dropdown" onchange="filterBySpace(this.value)" disabled>
-            <option value="">Select Space</option>
-        </select>
-    </div>
-    
-    <!-- Top Right Controls -->
-    <div class="top-right-controls">
-        <button class="control-btn-small btn-home" onclick="window.location.href='landing.html'">← Home</button>
-        <button class="control-btn-small btn-tour" onclick="window.open('https://drive.google.com/drive/folders/145UnvvoadbqJjg7VjREnkoo-QOGF9gUg', '_blank')">🔄 3DGS</button>
-        <button class="control-btn-small btn-upload" id="btn-upload-location" onclick="showUploadModal()">📍 Upload</button>
-        <button class="control-btn-small btn-logout" id="btn-logout" style="display:none;" onclick="handleLogout()">Logout</button>
-    </div>
 
 
     <!-- Bottom Left - Zoom Controls -->
     <div class="bottom-left-controls">
         <button class="zoom-btn" onclick="map.zoomIn()">+</button>
         <button class="zoom-btn" onclick="map.zoomOut()">−</button>
-    </div>
-    
+        </div>
+
     <!-- Bottom Right - Action Buttons -->
     <div class="bottom-right-controls">
         <button class="action-btn" id="edit-control-btn" onclick="toggleAnnotationsPanel()">✏️ Annotate</button>
         <button class="action-btn" id="map-layer-btn" onclick="toggleMapLayer()">🛰️ Satellite</button>
         <button class="action-btn" onclick="shareLocation()">🔗 Share</button>
-    </div>
+        </div>
 
-    <!-- Annotations Panel -->
+        <!-- Annotations Panel -->
     <div id="annotations-panel">
         <h3>✏️ Annotations</h3>
         <p style="color:#aaa;font-size:0.8rem;margin:0 0 10px 0;">Click a tool, then draw on map</p>
@@ -519,7 +688,7 @@
             <button class="draw-tool" onclick="activateDrawTool('polygon')">⬡ Polygon</button>
             <button class="draw-tool" onclick="activateDrawTool('rectangle')">▢ Rectangle</button>
             <button class="draw-tool" onclick="activateDrawTool('circle')">◯ Circle</button>
-        </div>
+            </div>
         <p style="color:#aaa;font-size:0.8rem;margin:10px 0 5px 0;">Select color:</p>
         <div class="color-palette">
             <button class="color-btn" data-color="#FF0000" style="background:#FF0000; border:3px solid white;" onclick="setDrawColor('#FF0000')"></button>
@@ -529,7 +698,7 @@
             <button class="color-btn" data-color="#FF00FF" style="background:#FF00FF;" onclick="setDrawColor('#FF00FF')"></button>
             <button class="color-btn" data-color="#00FFFF" style="background:#00FFFF;" onclick="setDrawColor('#00FFFF')"></button>
             <button class="color-btn" data-color="#FFFFFF" style="background:#FFFFFF;" onclick="setDrawColor('#FFFFFF')"></button>
-        </div>
+            </div>
         <button class="draw-tool" style="width:100%; margin-top:15px;" onclick="clearAllAnnotations()">🗑️ Clear All</button>
         <button class="draw-tool" style="width:100%; margin-top:10px;" onclick="toggleAnnotationsPanel()">✕ Close Panel</button>
     </div>
@@ -541,8 +710,14 @@
             <h2>📍 Upload Content</h2>
             <form id="uploadForm" onsubmit="handleUpload(event)">
                 <div class="form-group">
-                    <label>Organization Name *</label>
-                    <input type="text" id="org-name" required placeholder="Enter organization name">
+                    <label>Organization *</label>
+                    <div class="dropdown-with-input">
+                        <select id="org-select" onchange="handleOrgSelect(this.value)">
+                            <option value="">Select existing or add new...</option>
+                            <option value="__new__">➕ Add New Organization</option>
+                        </select>
+                        <input type="text" id="org-name" placeholder="Enter new organization name" style="display:none;">
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -555,7 +730,8 @@
                     <div class="media-type-selector">
                         <button type="button" class="media-type-btn" id="btn-image" onclick="selectMediaType('image')">📷 Image</button>
                         <button type="button" class="media-type-btn" id="btn-video" onclick="selectMediaType('video')">🎥 Video</button>
-                </div>
+                        <button type="button" class="media-type-btn" id="btn-panorama" onclick="selectMediaType('panorama')">🔄 360°</button>
+                    </div>
                 </div>
 
                 <!-- Image Fields -->
@@ -565,13 +741,12 @@
                         <input type="file" id="image-file" accept="image/*" onchange="handleImageSelect(event)">
                         <small>📍 GPS coordinates will be extracted automatically</small>
                 </div>
-
                 <div class="form-group">
                         <label>Coordinates * (auto-extracted or enter manually)</label>
                         <div class="coords-row">
                             <input type="text" id="image-lat" placeholder="Latitude">
                             <input type="text" id="image-lng" placeholder="Longitude">
-                </div>
+                        </div>
                     </div>
                 </div>
 
@@ -580,25 +755,56 @@
                 <div class="form-group">
                         <label>Video URL * (YouTube / Google Drive)</label>
                         <input type="url" id="video-url" placeholder="https://drive.google.com/... or https://youtube.com/...">
-                        <small>📹 Paste your Google Drive or YouTube video link</small>
-                    </div>
-                    <div class="form-group">
-                        <label>360° Image for 3D View (Optional)</label>
-                        <input type="file" id="video-360-image" accept="image/*">
-                        <small>🔄 Upload a 360° panorama or screenshot for the 3D view</small>
+                        <small>🎥 Video will play fullscreen when selected</small>
                     </div>
                 </div>
 
+                <!-- Panorama Fields (.dng / 360° images) -->
+                <div id="panorama-fields">
+                    <div class="form-group">
+                        <label>Panorama Source *</label>
+                        <div class="media-type-selector" style="margin-bottom:10px;">
+                            <button type="button" class="media-type-btn" id="btn-pano-file" onclick="selectPanoramaSource('file')">📁 Upload File</button>
+                            <button type="button" class="media-type-btn" id="btn-pano-url" onclick="selectPanoramaSource('url')">🔗 Paste URL</button>
+        </div>
+    </div>
+
+                    <div id="panorama-file-input" style="display:none;">
+                        <div class="form-group">
+                            <label>Upload 360° Panorama (.jpg, .png)</label>
+                            <input type="file" id="panorama-file" accept="image/jpeg,image/png,image/jpg" onchange="handlePanoramaSelect(event)">
+                            <small>⚠️ Max 50MB. For larger files (.dng), use URL option</small>
+            </div>
+            </div>
+                    
+                    <div id="panorama-url-input" style="display:none;">
+                        <div class="form-group">
+                            <label>Panorama Image URL</label>
+                            <input type="url" id="panorama-url" placeholder="https://i.imgur.com/xxxxx.jpg">
+                            <small>🔗 Direct image URL (recommended: <a href="https://imgur.com" target="_blank">Imgur.com</a> - free & reliable)<br>
+                            ⚠️ Note: Google Drive URLs often don't work due to CORS restrictions</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Coordinates (optional - leave empty for 3D-only view)</label>
+                        <div class="coords-row">
+                            <input type="text" id="panorama-lat" placeholder="Latitude (optional)">
+                            <input type="text" id="panorama-lng" placeholder="Longitude (optional)">
+            </div>
+                        <small>📍 If provided, panorama will be shown on map. If empty, accessible via space filter only.</small>
+            </div>
+            </div>
+
                 <button type="submit" class="submit-btn">Upload</button>
             </form>
-        </div>
+            </div>
     </div>
 
     <!-- Video Fullscreen Modal -->
     <div id="videoModal">
         <video id="fullscreen-video" controls autoplay></video>
         <div class="video-controls">
-            <button class="btn-3d" onclick="open3DView()">🔄 Enter 3D View</button>
             <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
         </div>
     </div>
@@ -627,9 +833,9 @@
         let map;
         let markersLayer;
         let selectedMediaType = null;
+        let selectedPanoramaSource = null; // 'file' or 'url'
         let currentVideoUrl = null;
         let currentVideoTime = 0;
-        let currentDriveFileId = null;
         let pannellumViewer = null;
         let allLocations = [];
         let streetLayer, satelliteLayer;
@@ -705,6 +911,9 @@
                 if (selectedMediaType === 'image') {
                     document.getElementById('image-lat').value = e.latlng.lat.toFixed(6);
                     document.getElementById('image-lng').value = e.latlng.lng.toFixed(6);
+                } else if (selectedMediaType === 'panorama') {
+                    document.getElementById('panorama-lat').value = e.latlng.lat.toFixed(6);
+                    document.getElementById('panorama-lng').value = e.latlng.lng.toFixed(6);
                 }
             });
             
@@ -755,18 +964,23 @@
             let markersAdded = 0;
             
             locations.forEach(loc => {
-                // Check for coordinates
-                if (!loc.latitude || !loc.longitude) {
-                    console.log('⚠️ Skipping location without coords:', loc.name || loc.id);
+                // Check for coordinates (treat 0,0 as no coords too)
+                const hasValidCoords = loc.latitude && loc.longitude && 
+                                       !(loc.latitude === 0 && loc.longitude === 0);
+                if (!hasValidCoords) {
+                    console.log('⚠️ Skipping location without coords:', loc.name || loc.id, '| Media:', loc.location_media?.length || 0, 'items');
                     return;
                 }
                 
                 const media = loc.location_media && loc.location_media[0];
-                const isVideo = media && media.media_type === 'video';
+                const mediaType = media?.media_type || loc.media_type || 'image';
+                const isVideo = mediaType === 'video';
+                const isPanorama = mediaType === 'panorama';
                 const orgName = loc.organizations?.name || loc.name || 'Unknown';
                 const spaceName = loc.spaces?.name || 'Unknown';
+                const fileUrl = media?.file_url || loc.file_url;
                 
-                console.log(`📌 Adding marker: ${orgName} / ${spaceName} at (${loc.latitude}, ${loc.longitude})`);
+                console.log(`📌 Adding marker: ${orgName} / ${spaceName} at (${loc.latitude}, ${loc.longitude}) - Type: ${mediaType}`);
                 
                 const marker = L.marker([loc.latitude, loc.longitude]);
                 
@@ -776,31 +990,28 @@
                         <em>${spaceName}</em><br><br>
                 `;
                 
-                if (media && media.file_url) {
+                if (fileUrl) {
                     if (isVideo) {
+                        // Video - just play button, no 3D option
                         popupContent += `
-                            <button onclick="playVideo('${media.file_url}')" 
+                            <button onclick="playVideo('${fileUrl}')" 
                                 style="width:100%;padding:10px;background:#23d18b;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">
                                 🎥 Play Video
                             </button>
                         `;
-            } else {
+                    } else if (isPanorama) {
+                        // Panorama - show 3D view button
                         popupContent += `
-                            <img src="${media.file_url}" style="width:100%;max-height:150px;object-fit:cover;border-radius:5px;">
-                        `;
-                    }
-                } else if (loc.file_url) {
-                    // Fallback to location's own file_url
-                    if (loc.media_type === 'video') {
-                        popupContent += `
-                            <button onclick="playVideo('${loc.file_url}')" 
-                                style="width:100%;padding:10px;background:#23d18b;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">
-                                🎥 Play Video
+                            <img src="${fileUrl}" style="width:100%;max-height:120px;object-fit:cover;border-radius:5px;margin-bottom:8px;">
+                            <button onclick="openPanorama3D('${fileUrl}')" 
+                                style="width:100%;padding:10px;background:#2F98CA;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">
+                                🔄 View in 3D
                             </button>
                         `;
             } else {
+                        // Regular image
                         popupContent += `
-                            <img src="${loc.file_url}" style="width:100%;max-height:150px;object-fit:cover;border-radius:5px;">
+                            <img src="${fileUrl}" style="width:100%;max-height:150px;object-fit:cover;border-radius:5px;">
                         `;
                     }
                 }
@@ -814,7 +1025,6 @@
             console.log(`✅ Added ${markersAdded} markers to map`);
             
             // Don't auto-zoom - keep full SA map view
-            // User can manually zoom to markers
         }
         
         // Load dropdown options
@@ -882,15 +1092,52 @@
             console.log('🔍 Filtered by space:', spaceName, '- Found:', filtered.length);
             displayLocations(filtered);
             
-            // If video with valid URL, auto-play
-            if (filtered.length === 1) {
-                const loc = filtered[0];
-                const media = loc.location_media && loc.location_media[0];
-                const fileUrl = media?.file_url || loc.file_url;
-                const mediaType = media?.media_type || loc.media_type;
-                console.log('📹 Video check:', { fileUrl, mediaType });
-                if (fileUrl && fileUrl.length > 5 && mediaType === 'video') {
-                    playVideo(fileUrl);
+            // Check for media to auto-open
+            if (filtered.length >= 1) {
+                // Find a location with media
+                let locWithMedia = null;
+                let mediaData = null;
+                
+                for (const loc of filtered) {
+                    console.log('🔍 Checking location for media:', loc.name, loc.location_media);
+                    if (loc.location_media && loc.location_media.length > 0) {
+                        locWithMedia = loc;
+                        mediaData = loc.location_media[0];
+                        break;
+                    }
+                }
+                
+                if (locWithMedia && mediaData) {
+                    const fileUrl = mediaData.file_url;
+                    const mediaType = mediaData.media_type;
+                    
+                    // Check if location has valid coords (0,0 counts as no coords)
+                    const hasValidCoords = locWithMedia.latitude && locWithMedia.longitude && 
+                                          !(locWithMedia.latitude === 0 && locWithMedia.longitude === 0);
+                    
+                    // Check if it's a panorama (stored in localStorage)
+                    const panoramaList = JSON.parse(localStorage.getItem('panoramaUrls') || '{}');
+                    const isPanorama = panoramaList[fileUrl] === true;
+                    
+                    console.log('📹 Media found:', { fileUrl, mediaType, hasValidCoords, isPanorama });
+                    
+                    // If video with valid URL, auto-play
+                    if (fileUrl && fileUrl.length > 5 && mediaType === 'video') {
+                        playVideo(fileUrl);
+                    }
+                    // If panorama without coordinates, open 3D view directly
+                    else if (fileUrl && fileUrl.length > 5 && isPanorama && !hasValidCoords) {
+                        console.log('🔄 Opening panorama directly in 3D view');
+                        openPanorama3D(fileUrl);
+                    }
+                    // Also check if no coords and image type - might be a panorama
+                    else if (fileUrl && fileUrl.length > 5 && mediaType === 'image' && !hasValidCoords) {
+                        // Assume images without coords are panoramas (for backward compatibility)
+                        console.log('🔄 Opening image without coords as panorama in 3D view');
+                        openPanorama3D(fileUrl);
+                    }
+                } else {
+                    console.log('⚠️ No media found for filtered locations. Check if location_media entries exist in database.');
                 }
             }
         }
@@ -964,7 +1211,6 @@
                 }
                 
                 if (videoId) {
-                    currentDriveFileId = null; // Clear drive ID
                     videoModal.innerHTML = `
                         <iframe 
                             id="embed-player"
@@ -974,7 +1220,6 @@
                             allowfullscreen>
                         </iframe>
                         <div class="video-controls">
-                            <button class="btn-3d" onclick="open3DViewFromEmbed()">🔄 Enter 3D View</button>
                             <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
                         </div>
                     `;
@@ -986,7 +1231,6 @@
             // Check if it's a Google Drive URL
             if (url.includes('drive.google.com')) {
                 let fileId = '';
-                // Extract file ID from various Google Drive URL formats
                 if (url.includes('/file/d/')) {
                     fileId = url.split('/file/d/')[1].split('/')[0];
                 } else if (url.includes('id=')) {
@@ -995,7 +1239,6 @@
                 
                 if (fileId) {
                     console.log('📁 Google Drive file ID:', fileId);
-                    currentDriveFileId = fileId;
                     
                     // Use Google Drive's embedded player
                     videoModal.innerHTML = `
@@ -1008,7 +1251,6 @@
                                 allowfullscreen>
                             </iframe>
                             <div class="video-controls" style="position:relative;padding:15px;background:rgba(0,0,0,0.9);">
-                                <button class="btn-3d" onclick="open3DViewFromEmbed()">🔄 Enter 3D View</button>
                                 <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
                             </div>
                         </div>
@@ -1018,14 +1260,12 @@
                 }
             }
             
-            // Regular video file (direct URL) - supports 3D frame capture
-            console.log('▶️ Playing direct video URL (3D supported)');
+            // Regular video file (direct URL)
+            console.log('▶️ Playing direct video URL');
             
-            // Restore video element if it was replaced
             videoModal.innerHTML = `
                 <video id="fullscreen-video" controls autoplay style="width:100%;height:100%;object-fit:contain;"></video>
                 <div class="video-controls">
-                    <button class="btn-3d" onclick="open3DView()">🔄 Enter 3D View</button>
                     <button class="btn-close" onclick="closeVideoModal()">✕ Close</button>
                 </div>
             `;
@@ -1185,6 +1425,92 @@
             }
         }
         
+        // Open panorama in 3D viewer (for .dng and 360° images)
+        function openPanorama3D(imageUrl) {
+            console.log('🔄 Opening panorama in 3D:', imageUrl);
+            
+            // Convert Google Drive URL to direct download URL
+            let finalUrl = imageUrl;
+            if (imageUrl.includes('drive.google.com')) {
+                let fileId = '';
+                if (imageUrl.includes('/file/d/')) {
+                    fileId = imageUrl.split('/file/d/')[1].split('/')[0];
+                } else if (imageUrl.includes('id=')) {
+                    fileId = imageUrl.split('id=')[1].split('&')[0];
+                } else if (imageUrl.includes('uc?export=view&id=')) {
+                    fileId = imageUrl.split('id=')[1].split('&')[0];
+                }
+                
+                if (fileId) {
+                    // Try multiple Google Drive URL formats
+                    finalUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
+                    console.log('📁 Converted to Google Photos URL:', finalUrl);
+                }
+            }
+            
+            document.getElementById('viewer3dModal').style.display = 'block';
+            
+            // Update hint text
+            const hint = document.querySelector('.nav-hint');
+            if (hint) {
+                hint.innerHTML = '🖱️ Drag to look around • Scroll to zoom • Loading...';
+            }
+            
+            // Update controls for panorama (no "Resume Video" button)
+            const viewerControls = document.querySelector('#viewer3dModal .viewer-controls');
+            if (viewerControls) {
+                viewerControls.innerHTML = `
+                    <button onclick="close3DView()">✕ Close 3D View</button>
+                `;
+            }
+            
+            // Initialize Pannellum with the panorama image
+            if (pannellumViewer) {
+                pannellumViewer.destroy();
+            }
+            
+            pannellumViewer = pannellum.viewer('panorama-viewer', {
+                type: 'equirectangular',
+                panorama: finalUrl,
+                autoLoad: true,
+                compass: true,
+                showZoomCtrl: true,
+                showFullscreenCtrl: false,
+                hfov: 100,
+                pitch: 0,
+                yaw: 0,
+                autoRotate: -2,
+                hotSpots: [
+                    { pitch: 0, yaw: 0, type: 'info', text: 'Front' },
+                    { pitch: 0, yaw: 90, type: 'info', text: 'Right' },
+                    { pitch: 0, yaw: 180, type: 'info', text: 'Back' },
+                    { pitch: 0, yaw: -90, type: 'info', text: 'Left' }
+                ]
+            });
+            
+            // Add error handling
+            pannellumViewer.on('error', function(err) {
+                console.error('Pannellum error:', err);
+                if (hint) {
+                    hint.innerHTML = `
+                        ⚠️ <strong>Could not load panorama from Google Drive</strong><br>
+                        <small style="font-size:0.85rem;">
+                        • Google Drive blocks external panorama viewers<br>
+                        • Use <a href="https://imgur.com" target="_blank" style="color:#2F98CA;">Imgur.com</a> instead (free & works perfectly)<br>
+                        • Or convert .dng to JPEG and upload directly
+                        </small>
+                    `;
+                }
+            });
+            
+            pannellumViewer.on('load', function() {
+                console.log('✅ Panorama loaded successfully');
+                if (hint) {
+                    hint.innerHTML = '🖱️ Drag to look around • Scroll to zoom';
+                }
+            });
+        }
+        
         // Toggle annotations panel
         function toggleAnnotationsPanel() {
             const panel = document.getElementById('annotations-panel');
@@ -1314,18 +1640,59 @@
         }
         
         // Upload modal functions
-        function showUploadModal() {
+        async function showUploadModal() {
             document.getElementById('uploadModal').style.display = 'block';
+            // Populate dropdowns
+            await populateUploadDropdowns();
+        }
+        
+        // Populate organization dropdown in upload modal
+        async function populateUploadDropdowns() {
+            try {
+                // Fetch organizations only
+                const { data: orgs } = await supabase.from('organizations').select('id, name').order('name');
+                const orgSelect = document.getElementById('org-select');
+                orgSelect.innerHTML = '<option value="">Select existing or add new...</option><option value="__new__">➕ Add New Organization</option>';
+                if (orgs) {
+                    orgs.forEach(org => {
+                        const opt = document.createElement('option');
+                        opt.value = org.name;
+                        opt.textContent = org.name;
+                        orgSelect.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error('Error populating dropdown:', e);
+            }
+        }
+        
+        // Handle organization select
+        function handleOrgSelect(value) {
+            const nameInput = document.getElementById('org-name');
+            if (value === '__new__') {
+                nameInput.style.display = 'block';
+                nameInput.focus();
+            } else {
+                nameInput.style.display = 'none';
+            }
         }
         
         function closeUploadModal() {
-                document.getElementById('uploadModal').style.display = 'none';
+            document.getElementById('uploadModal').style.display = 'none';
             document.getElementById('uploadForm').reset();
             document.getElementById('image-fields').classList.remove('active');
             document.getElementById('video-fields').classList.remove('active');
+            document.getElementById('panorama-fields').classList.remove('active');
             document.getElementById('btn-image').classList.remove('active');
             document.getElementById('btn-video').classList.remove('active');
+            document.getElementById('btn-panorama').classList.remove('active');
+            document.getElementById('btn-pano-file').classList.remove('active');
+            document.getElementById('btn-pano-url').classList.remove('active');
+            document.getElementById('panorama-file-input').style.display = 'none';
+            document.getElementById('panorama-url-input').style.display = 'none';
+            document.getElementById('org-name').style.display = 'none';
             selectedMediaType = null;
+            selectedPanoramaSource = null;
         }
         
         // Select media type
@@ -1334,8 +1701,59 @@
             
             document.getElementById('btn-image').classList.toggle('active', type === 'image');
             document.getElementById('btn-video').classList.toggle('active', type === 'video');
+            document.getElementById('btn-panorama').classList.toggle('active', type === 'panorama');
             document.getElementById('image-fields').classList.toggle('active', type === 'image');
             document.getElementById('video-fields').classList.toggle('active', type === 'video');
+            document.getElementById('panorama-fields').classList.toggle('active', type === 'panorama');
+            
+            // Reset panorama source when switching to panorama
+            if (type === 'panorama') {
+                selectedPanoramaSource = null;
+                document.getElementById('btn-pano-file').classList.remove('active');
+                document.getElementById('btn-pano-url').classList.remove('active');
+                document.getElementById('panorama-file-input').style.display = 'none';
+                document.getElementById('panorama-url-input').style.display = 'none';
+            }
+        }
+        
+        // Select panorama source (file or URL)
+        function selectPanoramaSource(source) {
+            selectedPanoramaSource = source;
+            
+            document.getElementById('btn-pano-file').classList.toggle('active', source === 'file');
+            document.getElementById('btn-pano-url').classList.toggle('active', source === 'url');
+            document.getElementById('panorama-file-input').style.display = source === 'file' ? 'block' : 'none';
+            document.getElementById('panorama-url-input').style.display = source === 'url' ? 'block' : 'none';
+        }
+        
+        // Handle panorama file select - extract GPS
+        function handlePanoramaSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (typeof EXIF !== 'undefined') {
+                EXIF.getData(file, function() {
+                    const lat = EXIF.getTag(this, 'GPSLatitude');
+                    const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
+                    const lng = EXIF.getTag(this, 'GPSLongitude');
+                    const lngRef = EXIF.getTag(this, 'GPSLongitudeRef');
+                    
+                    if (lat && lng && Array.isArray(lat) && Array.isArray(lng)) {
+                        let latDecimal = lat[0] + (lat[1] || 0)/60 + (lat[2] || 0)/3600;
+                        let lngDecimal = lng[0] + (lng[1] || 0)/60 + (lng[2] || 0)/3600;
+                        
+                        if (latRef === 'S') latDecimal = -latDecimal;
+                        if (lngRef === 'W') lngDecimal = -lngDecimal;
+                        
+                        document.getElementById('panorama-lat').value = latDecimal.toFixed(6);
+                        document.getElementById('panorama-lng').value = lngDecimal.toFixed(6);
+                        
+                        alert('✅ GPS extracted!\nLat: ' + latDecimal.toFixed(6) + '\nLng: ' + lngDecimal.toFixed(6));
+                    } else {
+                        alert('⚠️ No GPS data found in panorama. Please enter coordinates manually.');
+                    }
+                });
+            }
         }
         
         // Handle image select - extract GPS
@@ -1372,18 +1790,28 @@
         async function handleUpload(event) {
             event.preventDefault();
             
-            const orgName = document.getElementById('org-name').value.trim();
+            // Get org from dropdown or input, space from input field
+            const orgSelect = document.getElementById('org-select').value;
+            const orgName = orgSelect === '__new__' ? document.getElementById('org-name').value.trim() : orgSelect;
             const spaceName = document.getElementById('space-name').value.trim();
             
+            if (!orgName) {
+                alert('Please select or enter an organization name');
+                return;
+            }
+            if (!spaceName) {
+                alert('Please select or enter a space name');
+                return;
+            }
             if (!selectedMediaType) {
-                alert('Please select Image or Video');
+                alert('Please select Image, Video, or 360° Panorama');
                 return;
             }
             
             try {
                 // Create or get organization
                 let org = null;
-                const { data: existingOrg, error: orgFetchErr } = await supabase
+                const { data: existingOrg } = await supabase
                     .from('organizations')
                     .select('id')
                     .eq('name', orgName)
@@ -1403,7 +1831,7 @@
                 
                 // Create or get space
                 let space = null;
-                const { data: existingSpace, error: spaceFetchErr } = await supabase
+                const { data: existingSpace } = await supabase
                     .from('spaces')
                     .select('id')
                     .eq('name', spaceName)
@@ -1424,6 +1852,7 @@
                 let mediaUrl = '';
                 let lat = null;
                 let lng = null;
+                let mediaType = selectedMediaType;
                 
                 if (selectedMediaType === 'image') {
                     // Get coordinates
@@ -1454,7 +1883,6 @@
                     
                 } else if (selectedMediaType === 'video') {
                     const videoUrl = document.getElementById('video-url').value.trim();
-                    const panoramaFile = document.getElementById('video-360-image').files[0];
                     
                     if (!videoUrl) {
                         alert('Please provide a video URL');
@@ -1462,27 +1890,83 @@
                     }
                     
                     mediaUrl = videoUrl;
-                    
-                    // Upload 360 image if provided
-                    if (panoramaFile) {
-                        const fileName = `panoramas/${Date.now()}_${panoramaFile.name}`;
-                        const { data: uploadData, error: uploadErr } = await supabase.storage
-                            .from('location-files')
-                            .upload(fileName, panoramaFile);
-                        
-                        if (uploadErr) {
-                            console.error('Panorama upload error:', uploadErr);
-                        } else {
-                            const { data: urlData } = supabase.storage.from('location-files').getPublicUrl(fileName);
-                            // Store panorama URL - we'll save this with the location
-                            window.uploadedPanoramaUrl = urlData.publicUrl;
-                            console.log('✅ 360° image uploaded to:', window.uploadedPanoramaUrl);
-                        }
-                    }
-                    
-                    // Videos don't need coordinates - use default or null
+                    // Videos don't need coordinates
                     lat = null;
                     lng = null;
+                    
+                } else if (selectedMediaType === 'panorama') {
+                    // Get coordinates (optional for panoramas)
+                    const latVal = document.getElementById('panorama-lat').value.trim();
+                    const lngVal = document.getElementById('panorama-lng').value.trim();
+                    
+                    // Coordinates are optional for panoramas
+                    if (latVal && lngVal) {
+                        lat = parseFloat(latVal);
+                        lng = parseFloat(lngVal);
+                        if (isNaN(lat) || isNaN(lng)) {
+                            alert('Invalid coordinates. Leave empty or enter valid numbers.');
+                            return;
+                        }
+                    } else {
+                        lat = null;
+                        lng = null;
+                    }
+                    
+                    if (!selectedPanoramaSource) {
+                        alert('Please select Upload File or Paste URL for panorama');
+                        return;
+                    }
+                    
+                    if (selectedPanoramaSource === 'file') {
+                        // Upload panorama file
+                        const file = document.getElementById('panorama-file').files[0];
+                        if (!file) {
+                            alert('Please select a panorama file');
+                            return;
+                        }
+                        
+                        // Check file size (50MB limit)
+                        if (file.size > 50 * 1024 * 1024) {
+                            alert('File too large (max 50MB). Please use the URL option for larger files.');
+                            return;
+                        }
+                        
+                        const fileName = `panoramas/${Date.now()}_${file.name}`;
+                        const { data: uploadData, error: uploadErr } = await supabase.storage
+                            .from('location-files')
+                            .upload(fileName, file);
+                        
+                        if (uploadErr) throw uploadErr;
+                        
+                        const { data: urlData } = supabase.storage.from('location-files').getPublicUrl(fileName);
+                        mediaUrl = urlData.publicUrl;
+                        
+                    } else if (selectedPanoramaSource === 'url') {
+                        // Use provided URL
+                        const panoramaUrl = document.getElementById('panorama-url').value.trim();
+                        if (!panoramaUrl) {
+                            alert('Please provide a panorama URL');
+                            return;
+                        }
+                        
+                        // Convert Google Drive sharing link to direct URL if needed
+                        if (panoramaUrl.includes('drive.google.com')) {
+                            let fileId = '';
+                            if (panoramaUrl.includes('/file/d/')) {
+                                fileId = panoramaUrl.split('/file/d/')[1].split('/')[0];
+                            } else if (panoramaUrl.includes('id=')) {
+                                fileId = panoramaUrl.split('id=')[1].split('&')[0];
+                            }
+                            if (fileId) {
+                                // Use direct download URL for Google Drive
+                                mediaUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                            } else {
+                                mediaUrl = panoramaUrl;
+                            }
+                        } else {
+                            mediaUrl = panoramaUrl;
+                        }
+                    }
                 }
                 
                 // Create location
@@ -1501,25 +1985,36 @@
                 if (locErr) throw locErr;
                 
                 // Create media entry
-                const { error: mediaErr } = await supabase
+                // Store panoramas as 'image' type in DB (3D viewing handled separately)
+                const dbMediaType = mediaType === 'panorama' ? 'image' : mediaType;
+                
+                console.log('📤 Saving media:', { location_id: location.id, file_url: mediaUrl, media_type: dbMediaType });
+                
+                const { data: mediaData, error: mediaErr } = await supabase
                     .from('location_media')
                     .insert({
                         location_id: location.id,
                         file_url: mediaUrl,
-                        media_type: selectedMediaType
-                    });
+                        media_type: dbMediaType
+                    })
+                    .select();
                 
-                // If panorama image was uploaded, store the mapping
-                if (window.uploadedPanoramaUrl) {
-                    // Store panorama URL mapping in localStorage
-                    const panoramaMap = JSON.parse(localStorage.getItem('panoramaUrls') || '{}');
-                    panoramaMap[mediaUrl] = window.uploadedPanoramaUrl;
-                    localStorage.setItem('panoramaUrls', JSON.stringify(panoramaMap));
-                    console.log('✅ Saved panorama mapping for:', mediaUrl);
-                    window.uploadedPanoramaUrl = null;
+                if (mediaErr) {
+                    console.error('Media insert error:', mediaErr);
+                    // Delete the location if media failed to save
+                    await supabase.from('locations').delete().eq('id', location.id);
+                    throw new Error('Failed to save media: ' + mediaErr.message);
                 }
                 
-                if (mediaErr) throw mediaErr;
+                console.log('✅ Media saved:', mediaData);
+                
+                // Store panorama flag in localStorage for 3D viewing
+                if (mediaType === 'panorama') {
+                    const panoramaList = JSON.parse(localStorage.getItem('panoramaUrls') || '{}');
+                    panoramaList[mediaUrl] = true;
+                    localStorage.setItem('panoramaUrls', JSON.stringify(panoramaList));
+                    console.log('✅ Marked as panorama:', mediaUrl);
+                }
                 
                 alert('✅ Upload successful!');
                 closeUploadModal();
